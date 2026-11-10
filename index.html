@@ -328,8 +328,8 @@
   </footer>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby5uTK2eXt001Jdudx-zQbe1WcddeO_IEpkzHiM6xX8377Zu87nSjZQwIPezi9CsoDY/exec";
-
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzIBXnVD8tleVxzQVzBZQmUmgdPNQIFvXvmmhcwYl4X9JBRzQiJUsQiUUAmQj1henyq/exec";
+    
     const INITIAL_CATALOG = [
       "Airegin","All Blues","All of Me","All of You","All or Nothing at All","All The Things You Are","Alone Together","Along Came Betty","Anthropology","April in Paris","Ask Me Now","Au Privave","Autumn in New York","Autumn Leaves","Bags' Groove","Beatrice","Beautiful Love","Bessie's Blues","Billie's Bounce","Black Orpheus","Bloomdido","Blue Bossa","Blue in Green","Blue Monk","Blue Train","Blues For Alice","Blues in the Closet","Body and Soul","Bolivia","Broadway","But Beautiful","But Not for Me","Buzzy","Bye Bye Blackbird","Birdlike","C Jam Blues","C.T.A.","Cantaloupe Island","Caravan","Ceora","Cheese Cake","Chelsea Bridge","Cherokee","A Child Is Born","Come Rain or Come Shine","Come Sunday","Con Alma","Confirmation","Corcovado","Cottontail","Crazeology","Darn That Dream","Days of Wine and Roses","Desafinado","Dewey Square","Dexterity","Dolphin Dance","Donna Lee","Don't Get Around Much Anymore","Doxy","East of the Sun","Easy to Love","Embraceable You","Epistrophy","Equinox","The Eternal Triangle","Everything Happens to Me","Evidence","Ev'ry Time We Say Goodbye","Falling Grace","Footprints","Four","Fried Bananas","Gentle Rain","Georgia on My Mind","Giant Steps","The Girl from Ipanema","Good Bait","Green Dolphin Street","Groovin' High","Half Nelson","Have You Met Miss Jones?","Here's That Rainy Day","Hi-Fly","Honeysuckle Rose","How Deep Is the Ocean","How High the Moon","How Insensitive","I Can't Get Started","I Could Write a Book","I Fall in Love Too Easily","I Got Rhythm","I Hear a Rhapsody","I Love You","I Mean You","I Remember You","I Should Care","I Thought About You","If I Should Lose You","If I Were a Bell","I'll Remember April","I'm Getting Sentimental Over You","Impressions","In a Mellow Tone","In a Sentimental Mood","In Your Own Sweet Way","Inner Urge","Invitation","It Could Happen to You","It's You or No One","Jitterbug Waltz","Joy Spring","Just Friends","Just in Time","Just One of Those Things","Just You, Just Me","Lady Bird","Laura","Like Someone in Love","Like Sonny","Limehouse Blues","Little Sunflower","Long Ago and Far Away","Love for Sale","Lover","Lover Man","Lullaby of Birdland","Maiden Voyage","Manha de Carnaval","Meditation","Minority","Misterioso","Moment's Notice","Monk's Dream","Moose the Mooch","The More I See You","Move","Mr. P.C.","My Favorite Things","My Funny Valentine","My Ideal","My Little Suede Shoes","My One and Only Love","My Romance","My Shining Hour","Naima","Nica's Dream","Night and Day","Night Has a Thousand Eyes","A Night in Tunisia","Nothing Personal","Now's the Time","Old Devil Moon","Old Folks","Oleo","On a Slow Boat to China","On Green Dolphin Street","On the Sunny Side of the Street","One Note Samba","Ornithology","Out of Nowhere","Pannonica","Peace","Pensativa","Pent Up House","Perdido","Polka Dots and Moonbeams","Prelude to a Kiss","Recorda-Me","Reflections","Relaxin' at Camarillo","Rhythm-a-Ning","Room 608","Round Midnight","Ruby, My Dear","San-Du","Satin Doll","Scrapple from the Apple","Secret Love","Serpent's Tooth","Seven Come Eleven","Seven Steps to Heaven","Sidewinder","Skylark","So What","Softly, As in a Morning Sunrise","Solar","Some Day My Prince Will Come","Some Other Blues","Song for My Father","The Song Is You","Sonnymoon for Two","Soul Eyes","Speak Low","Speak No Evil","Spring Can Really Hang You Up the Most","St. Thomas","Stablemates","Star Eyes","Stella by Starlight","Stolen Moments","Straight, No Chaser","Sugar","Summertime","Take the 'A' Train","Tangerine","Tenderly","Tenor Madness","That's All","There Is No Greater Love","There Will Never Be Another You","This I Dig of You","The Touch of Your Lips","Triste","Tune Up","Turn Out the Stars","26-2","Up Jumped Spring","Upper Manhattan Medical Group","Voyage","Walking Shoes","Watermelon Man","Wave","Wee","Well You Needn't","When I Fall in Love","Whisper Not","Will You Still Be Mine","Woody 'n' You","Yardbird Suite","Yes or No","Yesterdays","You Stepped Out of a Dream","You'd Be So Nice to Come Home To"
     ];
@@ -394,36 +394,31 @@
       }
     }
 
-   async function saveToDrive() {
-      const btn = document.getElementById("btn-save-drive");
-      const originalText = btn.innerHTML;
-      btn.innerHTML = "⏳ Guardando...";
-      btn.disabled = true;
+async function saveToDrive() {
+  const btn = document.getElementById("btn-save-drive");
+  const originalText = btn.innerHTML;
+  btn.innerHTML = "⏳ Guardando...";
+  btn.disabled = true;
 
-      try {
-        const response = await fetch(SCRIPT_URL, {
-          method: "POST",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify(standards)
-        });
+  try {
+    await fetch(SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(standards)
+    });
 
-        const result = await response.json();
-
-        if (result && result.status === "success") {
-          btn.innerHTML = "✓ Guardado en Drive";
-          alert(`Guardado con éxito en Drive:\n${result.fileName}`);
-        } else {
-          throw new Error(result.message || "No se pudo guardar el archivo en Drive");
-        }
-      } catch (err) {
-        alert("Error al guardar en Drive: " + err.message);
-      } finally {
-        setTimeout(() => {
-          btn.innerHTML = originalText;
-          btn.disabled = false;
-        }, 2000);
-      }
-    }
+    btn.innerHTML = "✓ Guardado en Drive";
+    alert("Petición de guardado enviada a Google Drive.");
+  } catch (err) {
+    alert("Error al enviar a Drive: " + err.message);
+  } finally {
+    setTimeout(() => {
+      btn.innerHTML = originalText;
+      btn.disabled = false;
+    }, 2000);
+  }
+}
 
     async function loadFromDrive() {
       const btn = document.getElementById("btn-load-drive");
