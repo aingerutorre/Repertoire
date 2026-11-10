@@ -1,1104 +1,168 @@
 <!DOCTYPE html>
-<html lang="es" class="dark">
+<html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Jazz Standards — Pipeline & Spaced Repetition (SRS)</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>REPERTORIO</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-            mono: ['"JetBrains Mono"', 'monospace'],
-          },
-          colors: {
-            canvas: '#090a0c',
-            surface: {
-              900: '#101216',
-              850: '#16191f',
-              800: '#1c2027',
-              700: '#272d37',
-              600: '#38414f',
-              400: '#838f9e',
-              300: '#b0b9c5',
-              100: '#f0f3f6'
-            },
-            status: {
-              f0: '#64748b', // Backlog / Nivel 0
-              f1: '#f59e0b', // Melodía & Guías
-              f2: '#0ea5e9', // Lenguaje & 2/4
-              f3: '#a855f7', // Maduración / A capella
-              srs: '#10b981' // Asimilado / SRS
-            }
-          }
-        }
-      }
-    }
-  </script>
   <style>
-    .no-scrollbar::-webkit-scrollbar { display: none; }
-    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    input, select, textarea { color-scheme: dark; }
-    .tap-active:active { transform: scale(0.985); }
-  </style>
-</head>
-<body class="bg-canvas text-surface-100 font-sans antialiased min-h-screen selection:bg-surface-700 selection:text-white pb-14">
+    :root {
+      --bg: #090a0c;
+      --card: #121417;
+      --card-border: #23272f;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --accent: #38bdf8;
+      --accent-muted: rgba(56, 189, 248, 0.15);
+      --green: #4ade80;
+      --amber: #fbbf24;
+      --red: #f87171;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg);
+      color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+    }
+    .mono { font-family: 'JetBrains Mono', monospace; }
 
-  <!-- ENTORNO PRINCIPAL -->
-  <main class="max-w-5xl mx-auto px-3 sm:px-6 pt-4 sm:pt-6">
-    
-    <!-- HEADER COMPACTO & ACCIONES DE ESTUDIO -->
-    <header class="border-b border-surface-800 pb-3 mb-4">
-      <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
-        <div class="flex items-center gap-2.5">
-          <h1 class="text-base sm:text-lg font-bold tracking-tight text-white font-mono uppercase">REPERTORIO</h1>
-          <span id="headerTotalBadge" class="text-[11px] font-mono px-2 py-0.5 rounded bg-surface-850 text-surface-300 border border-surface-700/60 font-semibold">0 total</span>
-        </div>
+    header {
+      border-bottom: 1px solid var(--card-border);
+      background-color: rgba(9, 10, 12, 0.9);
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      backdrop-filter: blur(8px);
+      padding: 0.75rem 1rem;
+    }
+    .header-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+    }
+    .brand-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .badge-count {
+      font-size: 0.75rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 9999px;
+      background: var(--card-border);
+      color: var(--text-muted);
+    }
+    .btn-group { display: flex; gap: 0.5rem; align-items: center; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.4rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid var(--card-border);
+      background: var(--card);
+      color: var(--text-main);
+      transition: all 0.15s ease;
+    }
+    .btn:hover { background: #1c2027; border-color: #3b4252; }
+    .btn-primary { background: var(--accent); color: #000; border-color: var(--accent); }
+    .btn-primary:hover { opacity: 0.9; }
 
-        <!-- BOTONERA DE COMANDOS -->
-        <div class="flex items-center gap-1.5 flex-wrap">
-          <!-- Backup / Gestión JSON directa en cabecera -->
-          <button id="btnHeaderExport" title="Descargar copia JSON con fecha" class="tap-active flex items-center gap-1 px-2 py-1.5 rounded bg-surface-850 hover:bg-surface-800 border border-surface-700 text-surface-300 hover:text-white text-xs font-mono transition-colors">
-            <svg class="w-3.5 h-3.5 text-surface-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1M12 4v12m0 0l-3.5-3.5M12 16l3.5-3.5"></path></svg>
-            <span>Crear JSON</span>
-          </button>
-          
-          <label title="Cargar archivo JSON" class="tap-active flex items-center gap-1 px-2 py-1.5 rounded bg-surface-850 hover:bg-surface-800 border border-surface-700 text-surface-300 hover:text-white text-xs font-mono cursor-pointer transition-colors">
-            <svg class="w-3.5 h-3.5 text-surface-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1M16 8l-4-4m0 0L8 8m4-4v12"></path></svg>
-            <span>Cargar JSON</span>
-            <input type="file" id="headerImportInput" accept=".json" class="hidden">
-          </label>
-
-          <!-- Estudio Activo al azar -->
-          <button id="btnStudyRoll" class="tap-active flex items-center gap-1.5 px-2.5 py-1.5 rounded bg-surface-850 hover:bg-surface-800 border border-amber-600/40 text-amber-300 text-xs font-mono font-medium transition-colors">
-            <span>🎲</span>
-            <span>Estudio</span>
-          </button>
-          
-          <!-- En Frío (Asimilados) -->
-          <button id="btnJamRoll" class="tap-active flex items-center gap-1.5 px-2.5 py-1.5 rounded bg-surface-850 hover:bg-surface-800 border border-emerald-600/40 text-emerald-300 text-xs font-mono font-medium transition-colors">
-            <span>⚡</span>
-            <span>En Frío</span>
-          </button>
-
-          <!-- Nuevo Standard -->
-          <button id="btnOpenNew" class="tap-active flex items-center gap-1 px-2.5 py-1.5 rounded bg-surface-100 hover:bg-white text-canvas text-xs font-semibold tracking-wide transition-colors">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"></path></svg>
-            <span>Añadir</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- CHIPS DE KPI / FILTRADO RÁPIDO (UNA SOLA LÍNEA HORIZONTAL CON SCROLL) -->
-      <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-1 text-xs font-mono" id="filterPillsContainer">
-        <!-- Renderizado dinámicamente con badges numéricos exactos -->
-      </div>
-    </header>
-
-    <!-- BARRA DE FILTROS SECUNDARIOS & BÚSQUEDA -->
-    <section class="flex flex-wrap sm:flex-nowrap gap-2 mb-3">
-      <div class="relative flex-1 min-w-[200px]">
-        <svg class="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-surface-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-        <input type="text" id="searchInput" placeholder="Filtrar por título, tonalidad (Bb, Fm...), compases, autor..." class="w-full bg-surface-900 border border-surface-800 rounded py-1.5 pl-8 pr-3 text-xs text-surface-100 placeholder-surface-400/70 focus:outline-none focus:border-surface-600 transition-colors">
-      </div>
-      
-      <div class="flex items-center gap-1.5 shrink-0">
-        <select id="sortSelect" class="bg-surface-900 border border-surface-800 rounded py-1.5 px-2 text-xs font-mono text-surface-300 focus:outline-none focus:border-surface-600">
-          <option value="alpha">A-Z Alfabético</option>
-          <option value="status">Por Fase Técnica</option>
-          <option value="tempo">Por Tempo (BPM)</option>
-          <option value="due">Prioridad Repaso SRS</option>
-        </select>
-        
-        <button id="btnFilterDueToday" class="tap-active flex items-center gap-1.5 px-2.5 py-1.5 rounded bg-surface-900 hover:bg-surface-850 border border-surface-800 text-xs font-mono text-surface-300 transition-colors">
-          <span class="w-2 h-2 rounded-full bg-emerald-400" id="dueIndicatorDot"></span>
-          <span id="dueFilterLabel">Repasos (0)</span>
-        </button>
-      </div>
-    </section>
-
-    <!-- LISTADO COMPACTO DE STANDARDS -->
-    <div id="standardsContainer" class="space-y-1">
-      <!-- Se inyecta dinámicamente -->
-    </div>
-
-    <!-- ESTADO VACÍO -->
-    <div id="emptyView" class="hidden py-12 text-center border border-dashed border-surface-800 rounded-lg">
-      <p class="text-xs font-mono text-surface-400">No hay standards que coincidan con el filtro actual.</p>
-    </div>
-
-    <!-- PIE TÉCNICO Y GESTIÓN DE DATOS -->
-    <footer class="mt-10 pt-4 border-t border-surface-850 flex flex-wrap items-center justify-between gap-3 text-[11px] font-mono text-surface-400">
-      <div class="flex items-center gap-2.5 flex-wrap">
-        <button id="btnExportData" class="hover:text-surface-200 underline">Exportar Backup JSON</button>
-        <span>•</span>
-        <label class="hover:text-surface-200 underline cursor-pointer">
-          Restaurar JSON
-          <input type="file" id="importFileInput" accept=".json" class="hidden">
-        </label>
-        <span>•</span>
-        <button id="btnResetVault" class="hover:text-amber-400 underline">Reiniciar a lista completa (Fase 0)</button>
-      </div>
-      <div class="text-surface-400">
-        Persistencia Local: <span id="storageSizeInfo" class="text-surface-300">Activa</span>
-      </div>
-    </footer>
-  </main>
-
-  <!-- MODAL: DETALLES / EDICIÓN COMPLETA -->
-  <div id="detailModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 hidden">
-    <div class="bg-surface-900 border border-surface-700 w-full sm:max-w-lg rounded-t-xl sm:rounded-lg p-5 max-h-[92vh] overflow-y-auto no-scrollbar shadow-2xl">
-      <div class="flex items-center justify-between border-b border-surface-800 pb-3 mb-3">
-        <h3 id="modalHeadTitle" class="text-xs font-bold font-mono uppercase tracking-wider text-surface-200">Editar Standard</h3>
-        <button id="btnCloseDetailModal" class="text-surface-400 hover:text-white p-1">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-        </button>
-      </div>
-
-      <form id="editStandardForm" class="space-y-3.5">
-        <input type="hidden" id="editId">
-
-        <div>
-          <label class="block text-[10px] font-mono uppercase text-surface-400 mb-1">Título *</label>
-          <input type="text" id="editTitle" required class="w-full bg-surface-850 border border-surface-700 rounded px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-surface-400">
-        </div>
-
-        <div class="grid grid-cols-2 gap-2.5">
-          <div>
-            <label class="block text-[10px] font-mono uppercase text-surface-400 mb-1">Tono Concert *</label>
-            <input type="text" id="editKeyConcert" required placeholder="Bb, F, Eb, C minor..." class="w-full bg-surface-850 border border-surface-700 rounded px-2.5 py-1.5 text-xs font-mono text-white focus:outline-none focus:border-surface-400">
-          </div>
-          <div>
-            <label class="block text-[10px] font-mono uppercase text-surface-400 mb-1">Tono Sax / Transp.</label>
-            <input type="text" id="editKeyTransposed" placeholder="C, G, D minor..." class="w-full bg-surface-850 border border-surface-700 rounded px-2.5 py-1.5 text-xs font-mono text-white focus:outline-none focus:border-surface-400">
-          </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-2.5">
-          <div>
-            <label class="block text-[10px] font-mono uppercase text-surface-400 mb-1">Estructura / Forma</label>
-            <input type="text" id="editForm" placeholder="AABA (32c), Blues, ABAC..." class="w-full bg-surface-850 border border-surface-700 rounded px-2.5 py-1.5 text-xs font-mono text-white focus:outline-none focus:border-surface-400">
-          </div>
-          <div>
-            <label class="block text-[10px] font-mono uppercase text-surface-400 mb-1">Tempo diana (BPM)</label>
-            <input type="number" id="editTempo" min="40" max="360" placeholder="160" class="w-full bg-surface-850 border border-surface-700 rounded px-2.5 py-1.5 text-xs font-mono text-white focus:outline-none focus:border-surface-400">
-          </div>
-        </div>
-
-        <div>
-          <label class="block text-[10px] font-mono uppercase text-surface-400 mb-1">Nivel de Asimilación</label>
-          <select id="editStatus" class="w-full bg-surface-850 border border-surface-700 rounded px-2.5 py-1.5 text-xs font-mono text-white focus:outline-none focus:border-surface-400">
-            <option value="f0">Fase 0 · Pendientes</option>
-            <option value="f1">Fase 1 · Melodía</option>
-            <option value="f2">Fase 2 · Armonía</option>
-            <option value="f3">Fase 3 · Maduración</option>
-            <option value="srs">Asimilado · En rotación SRS</option>
-          </select>
-        </div>
-
-        <div>
-          <label class="block text-[10px] font-mono uppercase text-surface-400 mb-1">Notas técnicas / Grabación de referencia</label>
-          <textarea id="editNotes" rows="2" placeholder="Referencia: Sonny Rollins 1957; cuidar voice leading en compases 13-16..." class="w-full bg-surface-850 border border-surface-700 rounded px-2.5 py-1.5 text-xs text-surface-200 focus:outline-none focus:border-surface-400"></textarea>
-        </div>
-
-        <div class="flex items-center justify-between pt-2 border-t border-surface-800">
-          <button type="button" id="btnDeleteStd" class="text-xs font-mono text-red-400 hover:text-red-300 py-1 hidden">
-            Eliminar
-          </button>
-          <div class="flex items-center gap-2 ml-auto">
-            <button type="button" id="btnCancelDetail" class="px-3 py-1.5 rounded text-xs font-mono text-surface-400 hover:text-white">Cancelar</button>
-            <button type="submit" class="px-3.5 py-1.5 rounded bg-surface-100 hover:bg-white text-canvas text-xs font-semibold">Guardar</button>
-          </div>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- MODAL: RULETA ALEATORIA DE SESIÓN -->
-  <div id="rouletteModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 hidden">
-    <div class="bg-surface-900 border border-surface-700 w-full max-w-md rounded-lg p-5 shadow-2xl">
-      <div class="flex items-center justify-between border-b border-surface-800 pb-2.5 mb-3">
-        <div class="flex items-center gap-2">
-          <span id="rouletteIcon" class="text-sm">🎲</span>
-          <h3 id="rouletteTitleHeading" class="text-xs font-bold font-mono uppercase tracking-wider text-surface-200">Sugerencia de Estudio</h3>
-        </div>
-        <button id="btnCloseRoulette" class="text-surface-400 hover:text-white p-1">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-        </button>
-      </div>
-
-      <div id="rouletteResultBox" class="p-4 rounded bg-surface-850 border border-surface-800 space-y-2">
-        <div class="flex items-center justify-between">
-          <span id="roulettePhaseBadge" class="text-[10px] font-mono px-1.5 py-0.5 rounded border"></span>
-          <span id="rouletteKeyPill" class="text-xs font-mono font-bold text-white"></span>
-        </div>
-        <h4 id="rouletteStdName" class="text-lg font-bold text-white tracking-tight"></h4>
-        <div class="flex items-center gap-2 text-xs font-mono text-surface-400">
-          <span id="rouletteFormPill"></span>
-          <span>•</span>
-          <span id="rouletteTempoPill"></span>
-        </div>
-        
-        <div class="mt-3 pt-2.5 border-t border-surface-700/60">
-          <span class="block text-[10px] font-mono uppercase text-amber-400 mb-0.5">Enfoque de Estudio Recomendado</span>
-          <p id="rouletteChallenge" class="text-xs font-mono text-surface-200 leading-relaxed"></p>
-        </div>
-      </div>
-
-      <div id="rouletteEmptyMsg" class="hidden py-8 text-center text-xs font-mono text-surface-400">
-        No se encontraron temas en este grupo.
-      </div>
-
-      <div class="mt-4 flex gap-2">
-        <button id="btnSpinAgain" class="flex-1 py-1.5 rounded bg-surface-100 hover:bg-white text-canvas text-xs font-mono font-semibold transition-colors">
-          Tirar de nuevo
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    /* =========================================================================
-       CATÁLOGO COMPLETO DE STANDARDS (TODOS EN FASE 0 - BACKLOG INICIAL)
-       ========================================================================= */
-    const STORAGE_KEY = 'jazz_standards_vault_v3';
-
-    const STATUS_CONFIG = {
-      f0: { key: 'f0', label: 'Pendientes', short: 'F0', badge: 'bg-slate-800/60 text-slate-400 border-slate-700', dot: '#64748b' },
-      f1: { key: 'f1', label: 'Melodía', short: 'F1', badge: 'bg-amber-950/40 text-amber-400 border-amber-800/60', dot: '#f59e0b' },
-      f2: { key: 'f2', label: 'Armonía', short: 'F2', badge: 'bg-sky-950/40 text-sky-400 border-sky-800/60', dot: '#0ea5e9' },
-      f3: { key: 'f3', label: 'Maduración', short: 'F3', badge: 'bg-purple-950/40 text-purple-400 border-purple-800/60', dot: '#a855f7' },
-      srs: { key: 'srs', label: 'Asimilado', short: 'Asim', badge: 'bg-emerald-950/40 text-emerald-400 border-emerald-800/60', dot: '#10b981' }
-    };
-
-    // Colección deduplicada y unificada de los 177 standards en Nivel 0
-    const MASTER_SEED = [
-      { id: "std_001", title: "Airegin", key: "Fm / Ab", form: "AABA (36c)", tempo: 220, notes: "Sonny Rollins. Acentuaciones rápidas en compás 4 y forma irregular." },
-      { id: "std_002", title: "All Blues", key: "G", form: "Blues 12c (6/8 feel)", tempo: 135, notes: "Miles Davis. Compás de 6/8 con vamp clásico y acorde bVI7#9." },
-      { id: "std_003", title: "All of Me", key: "C", form: "ABAC (32c)", tempo: 160, notes: "Marks & Simons. Dominantes secundarios en ciclo (E7 - A7 - D7 - G7)." },
-      { id: "std_004", title: "All of You", key: "Eb", form: "ABAC (32c)", tempo: 140, notes: "Cole Porter. Pedal inicial y resoluciones mayores/menores." },
-      { id: "std_005", title: "All or Nothing at All", key: "Am / C", form: "AABA (64c)", tempo: 170, notes: "Arthur Altman. Interpretación clásica de Coltrane en tempo rápido con pedal." },
-      { id: "std_006", title: "All the Things You Are", key: "Ab", form: "AA2BA (36c)", tempo: 140, notes: "Jerome Kern. Ciclo de quintas por 5 tonalidades." },
-      { id: "std_007", title: "Alone Together", key: "Dm", form: "AAB (14+14+12c)", tempo: 130, notes: "Arthur Schwartz. 40 compases; fundamental para lenguaje menor." },
-      { id: "std_008", title: "Along Came Betty", key: "Ab", form: "AABA (32c)", tempo: 120, notes: "Benny Golson. Cambios ricos con II-V descendentes y contornos bop." },
-      { id: "std_009", title: "Anthropology", key: "Bb", form: "AABA (Rhythm Changes)", tempo: 230, notes: "Charlie Parker & Dizzy Gillespie. Bop head clásico a tempo up." },
-      { id: "std_010", title: "April in Paris", key: "C", form: "AABA (32c)", tempo: 125, notes: "Vernon Duke. Cuidar cadencias finales y coda de Basie." },
-      { id: "std_011", title: "Ask Me Now", key: "Db", form: "AABA (32c)", tempo: 75, notes: "Thelonious Monk. Balada con disonancias mayores y saltos interválicos." },
-      { id: "std_012", title: "Au Privave", key: "F", form: "Blues 12c", tempo: 175, notes: "Charlie Parker. Blues bebop arquetípico." },
-      { id: "std_013", title: "Autumn in New York", key: "F", form: "ABAC (32c)", tempo: 85, notes: "Vernon Duke. Balada cromática con modulaciones constantes." },
-      { id: "std_014", title: "Autumn Leaves", key: "Gm / Bb", form: "AABC (32c)", tempo: 145, notes: "Joseph Kosma. Ciclo diatónico mayor y menor coordinado." },
-      { id: "std_015", title: "Bags' Groove", key: "F", form: "Blues 12c", tempo: 130, notes: "Milt Jackson. Blues de riff con espacio y articulación." },
-      { id: "std_016", title: "Beatrice", key: "F", form: "16 bars", tempo: 120, notes: "Sam Rivers. Cambios modales abiertos (Fmaj7 - Gbmaj7 - Fmaj7 - Ebmaj7)." },
-      { id: "std_017", title: "Beautiful Love", key: "Dm / F", form: "AABA (32c)", tempo: 155, notes: "Victor Young. Cadencia clásica de IIø-V7 a Im y II-V a relativa mayor." },
-      { id: "std_018", title: "Bessie's Blues", key: "Eb", form: "Blues 12c", tempo: 190, notes: "John Coltrane. Blues bop enérgico en Eb." },
-      { id: "std_019", title: "Billie's Bounce", key: "F", form: "Blues 12c", tempo: 165, notes: "Charlie Parker. Vocabulario bebop indispensable." },
-      { id: "std_020", title: "Black Orpheus (Manhã de Carnaval)", key: "Am", form: "AABA (32c)", tempo: 135, notes: "Luiz Bonfá. Bossa clássica menor." },
-      { id: "std_021", title: "Bloomdido", key: "Bb", form: "Blues 12c", tempo: 180, notes: "Charlie Parker. Blues en Bb con arpegios y cromatismos en la cabeza." },
-      { id: "std_022", title: "Blue Bossa", key: "Cm", form: "16 bars", tempo: 140, notes: "Kenny Dorham. Modulación clara a Db mayor en compás 9." },
-      { id: "std_023", title: "Blue in Green", key: "Dm", form: "10 bars", tempo: 60, notes: "Miles Davis / Bill Evans. Forma cíclica de 10 compases sin resolución obvia." },
-      { id: "std_024", title: "Blue Monk", key: "Bb", form: "Blues 12c", tempo: 110, notes: "Thelonious Monk. Movimiento cromático en terceras sobre el blues." },
-      { id: "std_025", title: "Blue Train", key: "Eb", form: "Blues 12c", tempo: 120, notes: "John Coltrane. Blues menor/mayor con cortes rítmicos en la cabeza." },
-      { id: "std_026", title: "Blues for Alice", key: "F", form: "Bird Blues 12c", tempo: 160, notes: "Charlie Parker. Sustituciones descendentes de II-V (Bird changes)." },
-      { id: "std_027", title: "Blues in the Closet", key: "G / Bb", form: "Blues 12c", tempo: 190, notes: "Oscar Pettiford. Blues rápido con riff de llamada y respuesta." },
-      { id: "std_028", title: "Body and Soul", key: "Db", form: "AABA (32c)", tempo: 65, notes: "Johnny Green. Balada con puente modulante a D mayor y C mayor." },
-      { id: "std_029", title: "Bolivia", key: "G / Eb", form: "AABA (32c)", tempo: 180, notes: "Cedar Walton. Sección latina con pedal que rompe a swing." },
-      { id: "std_030", title: "Broadway", key: "Eb", form: "AABA (32c)", tempo: 185, notes: "Woode & McRae. Up-tempo swing clásico con cadencia final distintiva." },
-      { id: "std_031", title: "But Beautiful", key: "G", form: "ABAC (32c)", tempo: 70, notes: "Jimmy Van Heusen. Balada lenta de lirismo armónico refinado." },
-      { id: "std_032", title: "But Not for Me", key: "Eb", form: "AABA (32c)", tempo: 175, notes: "George Gershwin. Versiones de Chet Baker y Miles Davis." },
-      { id: "std_033", title: "Buzzy", key: "Bb", form: "Blues 12c", tempo: 170, notes: "Charlie Parker. Blues de riff sincopado en Bb." },
-      { id: "std_034", title: "Bye Bye Blackbird", key: "F", form: "AABA (32c)", tempo: 145, notes: "Ray Henderson. Referencia de Miles Davis en 'Round About Midnight." },
-      { id: "std_035", title: "Birdlike", key: "F", form: "Blues 12c", tempo: 240, notes: "Freddie Hubbard. Blues rápido moderno con acentos bop agresivos." },
-      { id: "std_036", title: "C Jam Blues", key: "C", form: "Blues 12c", tempo: 150, notes: "Duke Ellington. Riff minimalista de 2 notas sobre blues." },
-      { id: "std_037", title: "C.T.A.", key: "Bb", form: "AABA (Rhythm Changes)", tempo: 240, notes: "Jimmy Heath. Bop head intrincado sobre Anatole." },
-      { id: "std_038", title: "Cantaloupe Island", key: "Fm", form: "16 bars", tempo: 125, notes: "Herbie Hancock. Modal groove sobre Fm7 - Db7 - Dm7." },
-      { id: "std_039", title: "Caravan", key: "Fm / C", form: "AABA (64c)", tempo: 200, notes: "Juan Tizol & Duke Ellington. Vamp exótico en dominante en la parte A." },
-      { id: "std_040", title: "Ceora", key: "Ab", form: "ABAC (32c)", tempo: 135, notes: "Lee Morgan. Bossa melódica con modulaciones líricas a B mayor." },
-      { id: "std_041", title: "Cheese Cake", key: "Cm", form: "AABA (32c)", tempo: 195, notes: "Dexter Gordon. Cambios menores con riff de blues en la cabeza." },
-      { id: "std_042", title: "Chelsea Bridge", key: "Db", form: "AABA (32c)", tempo: 70, notes: "Billy Strayhorn. Armonía impresionista inspirada en Ravel." },
-      { id: "std_043", title: "Cherokee", key: "Bb", form: "AABA (64c)", tempo: 260, notes: "Ray Noble. Prueba de fuego para tempos extremos; puente con modulaciones en semitonos." },
-      { id: "std_044", title: "A Child Is Born", key: "Bb", form: "AABA (30c)", tempo: 80, notes: "Thad Jones. Balada en 3/4 con compases truncados en la última sección." },
-      { id: "std_045", title: "Come Rain or Come Shine", key: "F", form: "AABA (32c)", tempo: 130, notes: "Harold Arlen. Mezcla de blue notes con armonía funcional sólida." },
-      { id: "std_046", title: "Come Sunday", key: "Ab", form: "AABA (32c)", tempo: 65, notes: "Duke Ellington. Espiritual/himno con rica textura interválica." },
-      { id: "std_047", title: "Con Alma", key: "E / C", form: "AABA (36c)", tempo: 130, notes: "Dizzy Gillespie. Latin feel en compases impares, swing en el puente." },
-      { id: "std_048", title: "Confirmation", key: "F", form: "AABA (32c)", tempo: 210, notes: "Charlie Parker. La obra maestra de la conducción melódica bebop." },
-      { id: "std_049", title: "Corcovado", key: "C", form: "ABAC (32c)", tempo: 130, notes: "Antonio Carlos Jobim. Acorde inicial D9/F# que conduce a Fm6." },
-      { id: "std_050", title: "Cottontail", key: "Ab", form: "AABA (Rhythm Changes)", tempo: 220, notes: "Duke Ellington. Head icónico de saxofón sobre Anatole." },
-      { id: "std_051", title: "Crazeology", key: "Bb", form: "AABA (Rhythm Changes)", tempo: 230, notes: "Bud Powell / Benny Harris. Bebop up-tempo sobre cambios de I Got Rhythm." },
-      { id: "std_052", title: "Darn That Dream", key: "G", form: "AABA (32c)", tempo: 70, notes: "Jimmy Van Heusen. Balada armónicamente densa con cromatismos internos." },
-      { id: "std_053", title: "Days of Wine and Roses", key: "F", form: "ABAC (32c)", tempo: 140, notes: "Henry Mancini. Acorde II7 (G7) en el compás 3." },
-      { id: "std_054", title: "Desafinado", key: "F", form: "AABA (68c)", tempo: 150, notes: "Antonio Carlos Jobim. Melodía cromática intencionadamente ambigua." },
-      { id: "std_055", title: "Dewey Square", key: "Eb", form: "AABA (32c)", tempo: 175, notes: "Charlie Parker. Melodía fluida con aperturas y cierres bop." },
-      { id: "std_056", title: "Dexterity", key: "Bb", form: "AABA (Rhythm Changes)", tempo: 220, notes: "Charlie Parker. Líneas bop rápidas sobre Anatole." },
-      { id: "std_057", title: "Dolphin Dance", key: "Eb", form: "Forma abierta (42c)", tempo: 130, notes: "Herbie Hancock. Cambios modales sofisticados y suspensiones sus4." },
-      { id: "std_058", title: "Donna Lee", key: "Ab", form: "ABAC (32c)", tempo: 220, notes: "Charlie Parker / Miles Davis. Contrafact sobre Indiana." },
-      { id: "std_059", title: "Don't Get Around Much Anymore", key: "C", form: "AABA (32c)", tempo: 120, notes: "Duke Ellington. Swing de medio tiempo con inflexiones de blues." },
-      { id: "std_060", title: "Doxy", key: "Bb", form: "16 bars", tempo: 140, notes: "Sonny Rollins. Secuencia simple I - bVII7 - VI7 - II7 - V7." },
-      { id: "std_061", title: "East of the Sun", key: "G", form: "AABA (36c)", tempo: 135, notes: "Brooks Bowman. Cadencia con compás extendido al final de la forma." },
-      { id: "std_062", title: "Easy to Love", key: "Ab", form: "AABA (32c)", tempo: 160, notes: "Cole Porter. Comienza en el acorde II menor relativo." },
-      { id: "std_063", title: "Embraceable You", key: "G", form: "ABAC (32c)", tempo: 75, notes: "George Gershwin. Balada clásica ideal para variaciones melódicas." },
-      { id: "std_064", title: "Epistrophy", key: "Db / C#", form: "AABA (32c)", tempo: 160, notes: "Thelonious Monk. Movimiento de dominantes cromáticos en bloque." },
-      { id: "std_065", title: "Equinox", key: "C#m", form: "Blues 12c", tempo: 105, notes: "John Coltrane. Blues menor lento y sombrío." },
-      { id: "std_066", title: "Eternal Triangle", key: "Bb", form: "AABA (Rhythm Changes)", tempo: 240, notes: "Sonny Stitt. Puente cromático con II-V descendentes." },
-      { id: "std_067", title: "Everything Happens to Me", key: "Bb", form: "AABA (32c)", tempo: 70, notes: "Matt Dennis. Balada melancólica; versionada por Charlie Parker con cuerdas." },
-      { id: "std_068", title: "Evidence", key: "Eb", form: "AABA (Rhythm Changes)", tempo: 190, notes: "Thelonious Monk. Contrafact sobre Just You, Just Me con síncopas extremas." },
-      { id: "std_069", title: "Ev'ry Time We Say Goodbye", key: "Eb", form: "AABA (32c)", tempo: 70, notes: "Cole Porter. Famosa modulación de mayor a menor en el verso." },
-      { id: "std_070", title: "Falling Grace", key: "Ab", form: "16 bars", tempo: 145, notes: "Steve Swallow. Cambios modernos contemporáneos con centros tonales móviles." },
-      { id: "std_071", title: "Footprints", key: "Cm", form: "Blues menor 12c (6/4)", tempo: 155, notes: "Wayne Shorter. Cadencia final con F#m7b5 y F7#11 hacia Cm." },
-      { id: "std_072", title: "Four", key: "Eb", form: "ABAC (32c)", tempo: 190, notes: "Miles Davis / Eddie Vinson. Cambios directos y enérgicos de jam." },
-      { id: "std_073", title: "Fried Bananas", key: "Eb", form: "AABA (32c)", tempo: 180, notes: "Dexter Gordon. Contrafact bop sobre It Could Happen to You." },
-      { id: "std_074", title: "Gentle Rain", key: "Am", form: "AABA (32c)", tempo: 110, notes: "Luiz Bonfá. Bossa lenta y evocadora en modo menor." },
-      { id: "std_075", title: "Georgia on My Mind", key: "F", form: "AABA (32c)", tempo: 70, notes: "Hoagy Carmichael. Estándar sureño con matices de blues y gospel." },
-      { id: "std_076", title: "Giant Steps", key: "B / G / Eb", form: "16 bars", tempo: 250, notes: "John Coltrane. Ciclo de Coltrane Changes por terceras mayores." },
-      { id: "std_077", title: "Girl from Ipanema", key: "F", form: "AABA (40c)", tempo: 130, notes: "Antonio Carlos Jobim. Puente modulante de 16 compases." },
-      { id: "std_078", title: "Good Bait", key: "Bb / Eb", form: "AABA (32c)", tempo: 160, notes: "Tadd Dameron. Parte A en Bb, puente modula a Eb." },
-      { id: "std_079", title: "Green Dolphin Street", key: "Eb / C", form: "ABAB (32c)", tempo: 165, notes: "Bronislau Kaper. Pedal point en A (Latin) y swing en B." },
-      { id: "std_080", title: "Groovin' High", key: "Eb", form: "ABAC (32c)", tempo: 175, notes: "Dizzy Gillespie. Contrafact sobre Whispering." },
-      { id: "std_081", title: "Half Nelson", key: "C", form: "16 bars", tempo: 185, notes: "Miles Davis. Contrafact sobre Lady Bird con cambios alternativos." },
-      { id: "std_082", title: "Have You Met Miss Jones?", key: "F", form: "AABA (32c)", tempo: 180, notes: "Richard Rodgers. Puente con ciclo precursor de terceras mayores." },
-      { id: "std_083", title: "Here's That Rainy Day", key: "G", form: "ABAC (32c)", tempo: 100, notes: "Jimmy Van Heusen. Acorde bIImaj7 en compás 3." },
-      { id: "std_084", title: "Hi-Fly", key: "Bb", form: "AABA (32c)", tempo: 160, notes: "Randy Weston. Melodía construida sobre intervalos de cuarta aumentada." },
-      { id: "std_085", title: "Honeysuckle Rose", key: "F", form: "AABA (32c)", tempo: 155, notes: "Fats Waller. Armonía swing básica; puente clásico en IV." },
-      { id: "std_086", title: "How Deep Is the Ocean", key: "Cm / Eb", form: "ABAC (32c)", tempo: 130, notes: "Irving Berlin. Resoluciones alternadas menor/mayor." },
-      { id: "std_087", title: "How High the Moon", key: "G", form: "ABAC (32c)", tempo: 195, notes: "Morgan Lewis. Cambios bop por excelencia de jam session." },
-      { id: "std_088", title: "How Insensitive", key: "Dm", form: "AABA (32c)", tempo: 125, notes: "Antonio Carlos Jobim. Línea de bajo cromática descendente tipo Preludio de Chopin." },
-      { id: "std_089", title: "I Can't Get Started", key: "C", form: "AABA (32c)", tempo: 68, notes: "Vernon Duke. Balada clásica para trompeta (Bunny Berigan)." },
-      { id: "std_090", title: "I Could Write a Book", key: "Eb", form: "AABA (32c)", tempo: 160, notes: "Richard Rodgers. Interpretada por Miles Davis en quinteto." },
-      { id: "std_091", title: "I Fall in Love Too Easily", key: "Eb", form: "16 bars", tempo: 65, notes: "Jule Styne. Balada corta pero con progresión melódica impecable." },
-      { id: "std_092", title: "I Got Rhythm", key: "Bb", form: "AABA (32c)", tempo: 220, notes: "George Gershwin. La base del 50% del repertorio bebop." },
-      { id: "std_093", title: "I Hear a Rhapsody", key: "Eb", form: "AABA (32c)", tempo: 155, notes: "Fragos & Baker. Versión célebre de Coltrane en Lush Life." },
-      { id: "std_094", title: "I Love You", key: "F", form: "AABA (32c)", tempo: 190, notes: "Cole Porter. Empieza en G minor con resolución a F." },
-      { id: "std_095", title: "I Mean You", key: "F", form: "AABA (32c)", tempo: 170, notes: "Thelonious Monk. Riff rítmico con síncopas y coda característica." },
-      { id: "std_096", title: "I Remember You", key: "F", form: "AABA (36c)", tempo: 180, notes: "Victor Schertzinger. 4 compases extra en la última A." },
-      { id: "std_097", title: "I Should Care", key: "C", form: "ABAC (32c)", tempo: 110, notes: "Cahn, Stordahl & Weston. Balada/medium swing lírico." },
-      { id: "std_098", title: "I Thought About You", key: "Eb", form: "ABAC (32c)", tempo: 130, notes: "Jimmy Van Heusen. Melodía en movimiento ascendente gradual." },
-      { id: "std_099", title: "If I Should Lose You", key: "Gm / Bb", form: "ABAC (32c)", tempo: 160, notes: "Ralph Rainger. Famoso registro de Charlie Parker with Strings." },
-      { id: "std_100", title: "If I Were a Bell", key: "F", form: "AABA (32c)", tempo: 175, notes: "Frank Loesser. Típica intro con pedales en quintas de Miles Davis." },
-      { id: "std_101", title: "I'll Remember April", key: "G", form: "ABA (48c)", tempo: 195, notes: "Gene de Paul. Forma de 48 compases con alternancia mayor/menor." },
-      { id: "std_102", title: "I'm Getting Sentimental Over You", key: "F", form: "AABA (32c)", tempo: 140, notes: "George Bassman. Empieza en el acorde II menor." },
-      { id: "std_103", title: "Impressions", key: "Dm / Ebm", form: "AABA (Modal 32c)", tempo: 230, notes: "John Coltrane. Forma idéntica a So What (D Dorian / Eb Dorian)." },
-      { id: "std_104", title: "In a Mellow Tone", key: "Ab", form: "ABAC (32c)", tempo: 125, notes: "Duke Ellington. Basado en los cambios de Rose Room." },
-      { id: "std_105", title: "In a Sentimental Mood", key: "Fm / F", form: "AABA (32c)", tempo: 65, notes: "Duke Ellington. Balada de belleza estricta; versión con Coltrane." },
-      { id: "std_106", title: "In Your Own Sweet Way", key: "Fm / Bb", form: "AABA (34c)", tempo: 140, notes: "Dave Brubeck. Puente con pedales e interludio de 4 compases." },
-      { id: "std_107", title: "Inner Urge", key: "K/Modal", form: "24 bars", tempo: 190, notes: "Joe Henderson. Progresión modal moderna con acordes Maj7#11 en salto de tono." },
-      { id: "std_108", title: "Invitation", key: "Cm / Eb", form: "AABA (34c)", tempo: 175, notes: "Bronislau Kaper. Polirritmia latina y cadencias dramáticas." },
-      { id: "std_109", title: "It Could Happen to You", key: "Eb", form: "ABAC (32c)", tempo: 160, notes: "Jimmy Van Heusen. Estándar versátil tanto en balada como medium." },
-      { id: "std_110", title: "It's You or No One", key: "F", form: "AABA (32c)", tempo: 210, notes: "Jule Styne. Gran tema bop para tempos medios y rápidos." },
-      { id: "std_111", title: "Jitterbug Waltz", key: "Eb", form: "AABA (32c / 3/4)", tempo: 150, notes: "Fats Waller. Vals de jazz con cromatismos en la melodía." },
-      { id: "std_112", title: "Just Friends", key: "G / F", form: "ABAC (32c)", tempo: 195, notes: "John Klenner. Empieza en el acorde IV (Cmaj7)." },
-      { id: "std_113", title: "Just in Time", key: "Bb", form: "AABA (32c)", tempo: 180, notes: "Jule Styne. Swing vibrante y resoluciones directas." },
-      { id: "std_114", title: "Just One of Those Things", key: "Fm / F", form: "AABA (64c)", tempo: 230, notes: "Cole Porter. Gran vehículo up-tempo de jam." },
-      { id: "std_115", title: "Just You, Just Me", key: "Eb", form: "AABA (32c)", tempo: 160, notes: "Jesse Greer. Base armónica sobre la que Monk compuso Evidence." },
-      { id: "std_116", title: "Lady Bird", key: "C", form: "16 bars", tempo: 165, notes: "Tadd Dameron. II-V a Ebmaj7 y Abmaj7 (sustitutos de Dameron)." },
-      { id: "std_117", title: "Laura", key: "C", form: "ABAC (32c)", tempo: 80, notes: "David Raksin. Comienza con un acorde Am9 ambiguo." },
-      { id: "std_118", title: "Let's Cool One", key: "Eb", form: "AABA (32c)", tempo: 125, notes: "Thelonious Monk. Medium swing relajado con síncopas únicas." },
-      { id: "std_119", title: "Like Someone in Love", key: "C", form: "ABAC (32c)", tempo: 140, notes: "Jimmy Van Heusen. Cadencias líricas y modulaciones sutiles." },
-      { id: "std_120", title: "Like Sonny", key: "Dm", form: "AABA (32c)", tempo: 160, notes: "John Coltrane. Bossa/Latin feel compuesta en honor a Sonny Rollins." },
-      { id: "std_121", title: "Limehouse Blues", key: "Ab", form: "AABA (32c)", tempo: 240, notes: "Philip Braham. Secuencia de dominantes en círculo extendido." },
-      { id: "std_122", title: "Little Sunflower", key: "Dm / D", form: "AABA (Modal 32c)", tempo: 130, notes: "Freddie Hubbard. Modal latino con alternancia menor y mayor." },
-      { id: "std_123", title: "Long Ago and Far Away", key: "F", form: "AABA (32c)", tempo: 155, notes: "Jerome Kern. Gran vehículo melódico y armónico." },
-      { id: "std_124", title: "Love for Sale", key: "Bbm / Bb", form: "AABA (64c)", tempo: 190, notes: "Cole Porter. Contraste de sección latina en menor y swing en mayor." },
-      { id: "std_125", title: "Lover", key: "C", form: "AABA (64c / 3/4 o 4/4)", tempo: 220, notes: "Richard Rodgers. Descenso cromático continuo de acordes mayores y dominantes." },
-      { id: "std_126", title: "Lover Man", key: "F", form: "AABA (32c)", tempo: 70, notes: "Davis, Ramirez & Sherman. Balada inmortalizada por Billie Holiday." },
-      { id: "std_127", title: "Lullaby of Birdland", key: "Ab / Fm", form: "AABA (32c)", tempo: 160, notes: "George Shearing. Estándar clásico con giro de acordes en círculo menor." },
-      { id: "std_128", title: "Maiden Voyage", key: "Modal", form: "AABA (32c)", tempo: 120, notes: "Herbie Hancock. Acordes 7sus4 suspendidos sin tercera (D7sus, F7sus, etc.)." },
-      { id: "std_129", title: "Meditation", key: "C", form: "AABA (32c)", tempo: 130, notes: "Antonio Carlos Jobim. Bossa clássica con resoluciones melódicas suaves." },
-      { id: "std_130", title: "Minority", key: "Fm", form: "AABA (32c)", tempo: 200, notes: "Gigi Gryce. Gran tema up-tempo menor con giros melódicos bop." },
-      { id: "std_131", title: "Misterioso", key: "Eb", form: "Blues 12c", tempo: 90, notes: "Thelonious Monk. Blues construido sobre sextas paralelas." },
-      { id: "std_132", title: "Moment's Notice", key: "Eb", form: "ABAC (38c)", tempo: 230, notes: "John Coltrane. Progresión rápida de II-V antes de resolver a Eb." },
-      { id: "std_133", title: "Monk's Dream", key: "C", form: "AABA (32c)", tempo: 150, notes: "Thelonious Monk. Tema característico con acordes de tono entero." },
-      { id: "std_134", title: "Moose the Mooche", key: "Bb", form: "AABA (Rhythm Changes)", tempo: 180, notes: "Charlie Parker. Anatole bop con fraseo clásico en la cabeza." },
-      { id: "std_135", title: "Move", key: "Bb", form: "AABA (32c)", tempo: 220, notes: "Denzil Best. Bop head presente en Birth of the Cool." },
-      { id: "std_136", title: "Mr. P.C.", key: "Cm", form: "Blues 12c", tempo: 220, notes: "John Coltrane. Blues menor enérgico dedicado a Paul Chambers." },
-      { id: "std_137", title: "My Favourite Things", key: "Em / E", form: "AABA (3/4)", tempo: 180, notes: "Richard Rodgers. Versión icónica de John Coltrane en saxo soprano." },
-      { id: "std_138", title: "My Funny Valentine", key: "Cm / Eb", form: "AABA (36c)", tempo: 65, notes: "Richard Rodgers. Balada fundamental con línea de bajo en cliché de semitonos." },
-      { id: "std_139", title: "My Ideal", key: "Eb", form: "ABAC (32c)", tempo: 75, notes: "Richard Whiting. Balada lírica de gran belleza armónica." },
-      { id: "std_140", title: "My Little Suede Shoes", key: "Eb", form: "AABA (32c)", tempo: 150, notes: "Charlie Parker. Ritmo latino/calypso compuesto por Bird." },
-      { id: "std_141", title: "My One and Only Love", key: "C", form: "AABA (32c)", tempo: 65, notes: "Guy Wood. Balada de referencia tocada por Coltrane y Johnny Hartman." },
-      { id: "std_142", title: "My Romance", key: "Bb", form: "ABAC (32c)", tempo: 120, notes: "Richard Rodgers. Acordes diatónicos y gran vehículo de rearmonización." },
-      { id: "std_143", title: "My Shining Hour", key: "Eb", form: "ABAC (32c)", tempo: 180, notes: "Harold Arlen. Medium-up swing vigoroso." },
-      { id: "std_144", title: "Naima", key: "Ab", form: "AABA (20c)", tempo: 60, notes: "John Coltrane. Balada modal con acordes sobre pedales de bajo fijos (Bb y Eb)." },
-      { id: "std_145", title: "Nica's Dream", key: "Bbm / Db", form: "AABA (64c)", tempo: 180, notes: "Horace Silver. Latin/swing dedicado a la baronesa de Koenigswarter." },
-      { id: "std_146", title: "Night and Day", key: "C / Eb", form: "AABA (48c)", tempo: 160, notes: "Cole Porter. Comienza en el acorde bVII7 o IV menor." },
-      { id: "std_147", title: "Night Has a Thousand Eyes", key: "G", form: "AABA (48c)", tempo: 180, notes: "Jerry Brainin. Intersección de Latin en compás irregular y swing en el solo." },
-      { id: "std_148", title: "Night in Tunisia", key: "Dm", form: "AABA (Interludio)", tempo: 180, notes: "Dizzy Gillespie. Vamp con Eb7(b5) hacia Dm e interludio bop célebre." },
-      { id: "std_149", title: "Nothing Personal", key: "Gm", form: "Blues 12c (Modal)", tempo: 180, notes: "Don Grolnick. Blues moderno con acordes cuartales popularizado por Michael Brecker." },
-      { id: "std_150", title: "Now's the Time", key: "F", form: "Blues 12c", tempo: 155, notes: "Charlie Parker. Riff blues bop más famoso de la historia." },
-      { id: "std_151", title: "Old Devil Moon", key: "F", form: "AABA (48c)", tempo: 160, notes: "Burton Lane. Latin/swing con cambios de dominante a tónica alternados." },
-      { id: "std_152", title: "Old Folks", key: "F", form: "AABA (32c)", tempo: 70, notes: "Willard Robison. Balada tradicional con melodía expresiva." },
-      { id: "std_153", title: "Oleo", key: "Bb", form: "AABA (Rhythm Changes)", tempo: 230, notes: "Sonny Rollins. Anatole donde la sección A se toca tradicionalmente sin piano." },
-      { id: "std_154", title: "On a Slow Boat to China", key: "Bb", form: "ABAC (32c)", tempo: 150, notes: "Frank Loesser. Medium swing clásico de jam session." },
-      { id: "std_155", title: "On Green Dolphin Street", key: "Eb / C", form: "ABAB (32c)", tempo: 165, notes: "Bronislau Kaper. Cambios de tonalidad y feeling rítmico." },
-      { id: "std_156", title: "On the Sunny Side of the Street", key: "C", form: "AABA (32c)", tempo: 130, notes: "Jimmy McHugh. Swing alegre y accesible para jam." },
-      { id: "std_157", title: "One Note Samba", key: "Bb", form: "AABA (32c)", tempo: 170, notes: "Antonio Carlos Jobim. Cabeza centrada en notas repetidas con armonía descendente." },
-      { id: "std_158", title: "Ornithology", key: "G", form: "ABAC (32c)", tempo: 200, notes: "Charlie Parker. Contrafact bop icónico sobre How High The Moon." },
-      { id: "std_159", title: "Out of Nowhere", key: "G", form: "ABAC (32c)", tempo: 155, notes: "Johnny Green. Modulación repentina a Eb7 en el compás 3." },
-      { id: "std_160", title: "Pannonica", key: "C", form: "AABA (33c)", tempo: 75, notes: "Thelonious Monk. Balada con acordes de séptima mayor y compás extra." },
-      { id: "std_161", title: "Peace", key: "A", form: "10 bars", tempo: 65, notes: "Horace Silver. Balada lírica de 10 compases con resoluciones no convencionales." },
-      { id: "std_162", title: "Pensativa", key: "Gb", form: "AABA (32c)", tempo: 140, notes: "Clare Fischer. Bossa moderna con armonía sofisticada en Gb." },
-      { id: "std_163", title: "Pent Up House", key: "G", form: "16 bars", tempo: 190, notes: "Sonny Rollins. Tema bop directo en compás de 16 compases." },
-      { id: "std_164", title: "Perdido", key: "Bb", form: "AABA (32c)", tempo: 170, notes: "Juan Tizol. Swing clásico con puente de dominantes en círculo." },
-      { id: "std_165", title: "Polka Dots and Moonbeams", key: "F / G", form: "AABA (32c)", tempo: 65, notes: "Jimmy Van Heusen. Balada lírica de amplio contorno." },
-      { id: "std_166", title: "Prelude to a Kiss", key: "C", form: "AABA (32c)", tempo: 68, notes: "Duke Ellington. Armonía avanzada y cromatismo en la melodía." },
-      { id: "std_167", title: "Recorda-me", key: "Am", form: "16 bars", tempo: 165, notes: "Joe Henderson. Bossa/Latin que cambia a swing; ciclo armónico continuo." },
-      { id: "std_168", title: "Reflections", key: "Ab", form: "AABA (32c)", tempo: 70, notes: "Thelonious Monk. Balada lírica y angular de Monk." },
-      { id: "std_169", title: "Relaxin' at Camarillo", key: "C", form: "Blues 12c", tempo: 165, notes: "Charlie Parker. Blues con fraseo bop sincopado en C." },
-      { id: "std_170", title: "Rhythm-a-ning", key: "Bb", form: "AABA (Rhythm Changes)", tempo: 220, notes: "Thelonious Monk. Anatole con riff bop enérgico y disonante." },
-      { id: "std_171", title: "Room 608", key: "Bb", form: "AABA (Rhythm Changes)", tempo: 200, notes: "Horace Silver. Contrafact bop funky con cortes en la melodía." },
-      { id: "std_172", title: "'Round Midnight", key: "Ebm", form: "AABA (32c)", tempo: 60, notes: "Thelonious Monk. La balada más emblemática del jazz moderno." },
-      { id: "std_173", title: "Ruby, My Dear", key: "Eb", form: "AABA (32c)", tempo: 65, notes: "Thelonious Monk. Balada magistral dedicada a su primer amor." },
-      { id: "std_174", title: "San-Du", key: "Eb", form: "Blues 12c", tempo: 140, notes: "Clifford Brown. Blues de riff cálido y cantable." },
-      { id: "std_175", title: "Satin Doll", key: "C", form: "AABA (32c)", tempo: 130, notes: "Duke Ellington & Billy Strayhorn. Secuencias consecutivas de II-V." },
-      { id: "std_176", title: "Scrapple from the Apple", key: "F", form: "AABA (32c)", tempo: 200, notes: "Charlie Parker. Parte A sobre Honeysuckle Rose y puente de I Got Rhythm." },
-      { id: "std_177", title: "Secret Love", key: "Eb", form: "AABA (32c)", tempo: 190, notes: "Sammy Fain. Vehículo virtuoso popularizado por Dexter Gordon." },
-      { id: "std_178", title: "Serpent's Tooth", key: "Bb", form: "AABA (Rhythm Changes)", tempo: 210, notes: "Miles Davis. Anatole bop grabado con Sonny Rollins y Charlie Parker." },
-      { id: "std_179", title: "Seven Come Eleven", key: "Ab", form: "AABA (32c)", tempo: 210, notes: "Benny Goodman & Charlie Christian. Swing clásico de riff para guitarra." },
-      { id: "std_180", title: "Seven Steps to Heaven", key: "F", form: "AABA (32c)", tempo: 220, notes: "Victor Feldman & Miles Davis. Compases con paradas rítmicas en la cabeza." },
-      { id: "std_181", title: "Sidewinder", key: "Eb", form: "Blues 24c", tempo: 160, notes: "Lee Morgan. Boogaloo/Soul-jazz con ritmo de blues extendido a 24 compases." },
-      { id: "std_182", title: "Skylark", key: "Eb", form: "AABA (32c)", tempo: 65, notes: "Hoagy Carmichael. Balada lírica de gran complejidad armónica." },
-      { id: "std_183", title: "So What", key: "Dm / Ebm", form: "AABA (Modal 32c)", tempo: 140, notes: "Miles Davis. El manifiesto del jazz modal (Kind of Blue)." },
-      { id: "std_184", title: "Softly, as in a Morning Sunrise", key: "Cm", form: "AABA (32c)", tempo: 170, notes: "Sigmund Romberg. Cadencia menor clásica; versión célebre de Sonny Rollins." },
-      { id: "std_185", title: "Solar", key: "Cm", form: "12 bars (No Blues)", tempo: 150, notes: "Miles Davis / Chuck Wayne. Ciclo armónico continuo en 12 compases." },
-      { id: "std_186", title: "Some Day My Prince Will Come", key: "Bb", form: "ABAC (32c / 3/4)", tempo: 145, notes: "Frank Churchill. Vals de jazz indispensable; versión de Miles Davis." },
-      { id: "std_187", title: "Some Other Blues", key: "F", form: "Blues 12c", tempo: 170, notes: "John Coltrane. Blues con sustituciones de Coltrane." },
-      { id: "std_188", title: "Song for My Father", key: "Fm", form: "AAB (24c)", tempo: 130, notes: "Horace Silver. Groove de bossa dura con bajo ostinato característico." },
-      { id: "std_189", title: "The Song Is You", key: "C", form: "AABA (64c)", tempo: 220, notes: "Jerome Kern. Gran vehículo up-tempo de 64 compases." },
-      { id: "std_190", title: "Sonnymoon for Two", key: "Bb", form: "Blues 12c", tempo: 160, notes: "Sonny Rollins. Blues de riff con llamada y respuesta de 3 notas." },
-      { id: "std_191", title: "Soul Eyes", key: "Cm / Eb", form: "AABA (32c)", tempo: 70, notes: "Mal Waldron. Balada profunda grabada por John Coltrane." },
-      { id: "std_192", title: "Speak Low", key: "F", form: "AABA (32c)", tempo: 165, notes: "Kurt Weill. Latin/swing con ritmo sincopado." },
-      { id: "std_193", title: "Speak No Evil", key: "Cm", form: "AABA (32c)", tempo: 130, notes: "Wayne Shorter. Armonía moderna no funcional y melodía misteriosa." },
-      { id: "std_194", title: "Spring Can Really Hang You Up the Most", key: "C", form: "AABA (32c)", tempo: 65, notes: "Tommy Wolf. Balada armónicamente exigente con rica textura de acordes." },
-      { id: "std_195", title: "St. Thomas", key: "C", form: "16 bars", tempo: 195, notes: "Sonny Rollins. Calypso tradicional con solo de batería clásico." },
-      { id: "std_196", title: "Stablemates", key: "Db", form: "ABA (36c)", tempo: 175, notes: "Benny Golson. Forma irregular de 36 compases que comienza con II-V modulantes." },
-      { id: "std_197", title: "Star Eyes", key: "Eb", form: "AABA (36c)", tempo: 155, notes: "De Paul & Raye. Intro con riff latino/swing y compases extra en la cabeza." },
-      { id: "std_198", title: "Stella by Starlight", key: "Bb", form: "AABA/Through (32c)", tempo: 130, notes: "Victor Young. Comienza en acorde #IVø7 (Eø7); vehículo armónico universal." },
-      { id: "std_199", title: "Stolen Moments", key: "Cm", form: "Blues 16c", tempo: 115, notes: "Oliver Nelson. Blues menor extendido a 16 compases." },
-      { id: "std_200", title: "Straight, No Chaser", key: "F", form: "Blues 12c", tempo: 165, notes: "Thelonious Monk. Motivo rítmico desplazado métricamente sobre blues." },
-      { id: "std_201", title: "Sugar", key: "G minor", form: "16 bars", tempo: 125, notes: "Stanley Turrentine. Medium groove con armonía menor clara y bluesy." },
-      { id: "std_202", title: "Summertime", key: "Am / Dm", form: "16 bars", tempo: 120, notes: "George Gershwin. Vehículo armónico clásico y adaptable a cualquier tempo." },
-      { id: "std_203", title: "Take the 'A' Train", key: "C", form: "AABA (32c)", tempo: 170, notes: "Billy Strayhorn. El himno de la orquesta de Duke Ellington con acorde II7(b5)." },
-      { id: "std_204", title: "Tangerine", key: "F", form: "ABAC (32c)", tempo: 160, notes: "Victor Schertzinger. Swing ágil de jam session." },
-      { id: "std_205", title: "Tenderly", key: "Eb", form: "AABA (32c / 3/4 o 4/4)", tempo: 110, notes: "Walter Gross. Balada lírica tradicionalmente tocada en 3/4 o 4/4." },
-      { id: "std_206", title: "Tenor Madness", key: "Bb", form: "Blues 12c", tempo: 180, notes: "Sonny Rollins. Duelo histórico entre Sonny Rollins y John Coltrane." },
-      { id: "std_207", title: "That's All", key: "Bb", form: "AABA (32c)", tempo: 110, notes: "Haymes & Brandt. Medium ballad de swing aterciopelado." },
-      { id: "std_208", title: "The Theme", key: "Bb", form: "AABA (Rhythm Changes)", tempo: 240, notes: "Miles Davis. Firma de cierre habitual en los directos del quinteto." },
-      { id: "std_209", title: "There Is No Greater Love", key: "Bb", form: "AABA (32c)", tempo: 160, notes: "Isham Jones. Fundamental para estudiar articulación y lenguaje bop." },
-      { id: "std_210", title: "There Will Never Be Another You", key: "Eb", form: "ABAC (32c)", tempo: 180, notes: "Harry Warren. El estándar más tocado para audiciones y jam sessions." },
-      { id: "std_211", title: "This I Dig of You", key: "Bb", form: "AABA (32c)", tempo: 210, notes: "Hank Mobley. Bop swing directo con solos de batería en el head." },
-      { id: "std_212", title: "The Touch of Your Lips", key: "C", form: "ABAC (32c)", tempo: 130, notes: "Ray Noble. Balada/medium lírico con modulaciones agradables." },
-      { id: "std_213", title: "Triste", key: "Bb", form: "AABA (32c)", tempo: 155, notes: "Antonio Carlos Jobim. Bossa en Bb con armonía cromática fluida." },
-      { id: "std_214", title: "Tune Up", key: "D", form: "16 bars", tempo: 180, notes: "Miles Davis / Eddie Vinson. Tres progresiones de II-V descendentes (D, C, Bb)." },
-      { id: "std_215", title: "Turn Out The Stars", key: "Bm / C", form: "32 bars", tempo: 110, notes: "Bill Evans. Armonía compleja de voicings densos y resoluciones tardías." },
-      { id: "std_216", title: "26-2", key: "F", form: "AABA (32c)", tempo: 230, notes: "John Coltrane. Contrafact de Confirmation con Coltrane Changes incorporados." },
-      { id: "std_217", title: "Up Jumped Spring", key: "Bb", form: "AABA (32c / 3/4)", tempo: 145, notes: "Freddie Hubbard. Vals de jazz con saltos de cuarta en la melodía." },
-      { id: "std_218", title: "Upper Manhattan Medical Group (UMMG)", key: "Db", form: "AABA (32c)", tempo: 165, notes: "Billy Strayhorn. Armonía avanzada con compás de blues menor en el puente." },
-      { id: "std_219", title: "Voyage", key: "Dm", form: "AABA (32c)", tempo: 210, notes: "Kenny Barron. Post-bop clásico en tiempo rápido." },
-      { id: "std_220", title: "Walking (Walkin')", key: "F", form: "Blues 12c", tempo: 140, notes: "Richard Carpenter. Blues clásico hard-bop de Miles Davis." },
-      { id: "std_221", title: "Watermelon Man", key: "F", form: "Blues 16c", tempo: 125, notes: "Herbie Hancock. Blues con ritmo funky extendido a 16 compases." },
-      { id: "std_222", title: "Wave", key: "D", form: "AABA (44c)", tempo: 140, notes: "Antonio Carlos Jobim. Bossa con acorde dim7 y puente hacia Gm." },
-      { id: "std_223", title: "Wee (Allen's Alley)", key: "Bb", form: "AABA (Rhythm Changes)", tempo: 240, notes: "Denzil Best. Anatole vertiginoso grabado por Dizzy Gillespie." },
-      { id: "std_224", title: "Well, You Needn't", key: "F", form: "AABA (32c)", tempo: 175, notes: "Thelonious Monk. Acordes que se mueven en semitonos paralelos (F - Gb)." },
-      { id: "std_225", title: "When I Fall in Love", key: "Eb", form: "ABAC (32c)", tempo: 65, notes: "Victor Young. Balada clásica para baladistas." },
-      { id: "std_226", title: "Whisper Not", key: "Cm", form: "AABA (32c)", tempo: 125, notes: "Benny Golson. Hard-bop elegante con puente en relativo mayor." },
-      { id: "std_227", title: "Will You Still Be Mine?", key: "Bb", form: "AABA (64c)", tempo: 220, notes: "Matt Dennis. Gran tema up-tempo tocado en quinteto." },
-      { id: "std_228", title: "Woody 'n' You", key: "Db", form: "AABA (32c)", tempo: 180, notes: "Dizzy Gillespie. Cadenas de IIø-V7 que descienden medio tono." },
-      { id: "std_229", title: "Yardbird Suite", key: "C", form: "AABA (32c)", tempo: 170, notes: "Charlie Parker. Melodía bebop lírica y equilibrada." },
-      { id: "std_230", title: "Yes or No", key: "D", form: "AABA (56c)", tempo: 220, notes: "Wayne Shorter. Armonía modal rápida sobre compases de 14 compases." },
-      { id: "std_231", title: "Yesterdays", key: "Dm", form: "ABAC (32c)", tempo: 160, notes: "Jerome Kern. Frecuente en tempo rápido o balada dramática." },
-      { id: "std_232", title: "You Stepped Out of a Dream", key: "C", form: "AABA (32c)", tempo: 165, notes: "Nacio Herb Brown. Modulación inmediata a Dbmaj7 en compás 3." },
-      { id: "std_233", title: "You'd Be So Nice to Come Home To", key: "Am / C", form: "ABAC (32c)", tempo: 160, notes: "Cole Porter. Gran vehículo menor tocado por Jim Hall y Art Pepper." }
-    ];
-
-    // Desafíos pedagógicos para la ruleta
-    const STUDY_CHALLENGES = [
-      'Tocar melodía íntegra con metrónomo en pulsos 2 y 4 a tempo medio.',
-      'Solo continuo usando exclusivamente arpegios de 4 notas (1-3-5-7 o 7-5-3-1).',
-      'Tocar a capella (sin backing track) manteniendo la forma mentalmente.',
-      'Transportar mentalmente 1 tono arriba en tiempo real.',
-      'Tocar el tema como un Vals Jazz (3/4 feel) reinterpretando el ritmo armónico.',
-      'Aumentar el tempo objetivo diana en +15%.',
-      'Reducir a balada lenta (60 BPM) cuidando el timbre y ornamentación.',
-      'Hacer un chorus completo tocando exclusivamente notas guía (terceras y séptimas).'
-    ];
-
-    /* =========================================================================
-       ESTADO DE LA APLICACIÓN
-       ========================================================================= */
-    let standards = [];
-    let currentFilter = 'all'; // 'all' | 'f0' | 'f1' | 'f2' | 'f3' | 'srs' | 'due'
-    let searchQuery = '';
-    let sortMode = 'alpha'; // 'alpha' | 'status' | 'tempo' | 'due'
-    let expandedId = null;
-
-    /* =========================================================================
-       INICIALIZACIÓN Y PERSISTENCIA
-       ========================================================================= */
-    function loadData() {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (raw) {
-          standards = JSON.parse(raw);
-        } else {
-          // Inicializar catálogo completo con estado Fase 0
-          standards = MASTER_SEED.map(item => ({
-            id: item.id,
-            title: item.title,
-            keyConcert: item.key,
-            keyTransposed: '',
-            form: item.form,
-            tempo: item.tempo,
-            status: 'f0',
-            notes: item.notes,
-            srsInterval: 0,
-            lastReviewed: null,
-            nextReview: null
-          }));
-          saveData();
-        }
-      } catch (err) {
-        console.error('Error cargando almacenamiento:', err);
-        standards = [];
-      }
+    main {
+      flex: 1;
+      max-width: 1100px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
     }
 
-    function saveData() {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(standards));
-        const byteCount = new Blob([JSON.stringify(standards)]).size;
-        document.getElementById('storageSizeInfo').textContent = `${Math.round(byteCount / 1024)} KB`;
-      } catch (err) {
-        console.error('Error guardando en localStorage:', err);
-      }
+    .toolbar {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .search-row {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .input-text {
+      flex: 1;
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      padding: 0.5rem 0.85rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      outline: none;
+    }
+    .input-text:focus { border-color: var(--accent); }
+
+    .filter-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+    .chip {
+      padding: 0.3rem 0.65rem;
+      font-size: 0.72rem;
+      font-weight: 600;
+      border-radius: 6px;
+      background: var(--card);
+      color: var(--text-muted);
+      border: 1px solid var(--card-border);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .chip.active {
+      background: var(--accent-muted);
+      color: var(--accent);
+      border-color: var(--accent);
     }
 
-    function getTodayString() {
-      return new Date().toISOString().split('T')[0];
+    .roulette-panel {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
     }
 
-    function addDays(dateStr, days) {
-      const d = dateStr ? new Date(dateStr) : new Date();
-      d.setDate(d.getDate() + days);
-      return d.toISOString().split('T')[0];
+    .standards-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
     }
-
-    function isDue(std) {
-      if (std.status !== 'srs' || !std.nextReview) return false;
-      return std.nextReview <= getTodayString();
-    }
-
-    function countDueSRS() {
-      return standards.filter(isDue).length;
-    }
-
-    /* =========================================================================
-       RENDERIZADO
-       ========================================================================= */
-    function renderApp() {
-      renderPills();
-      renderList();
-    }
-
-    // 1. Chips de estadísticas y filtros superiores
-    function renderPills() {
-      const total = standards.length;
-      document.getElementById('headerTotalBadge').textContent = `${total} standards`;
-
-      const counts = { all: total, f0: 0, f1: 0, f2: 0, f3: 0, srs: 0 };
-      standards.forEach(s => {
-        if (counts[s.status] !== undefined) counts[s.status]++;
-      });
-
-      const dueCount = countDueSRS();
-      const dueLabel = document.getElementById('dueFilterLabel');
-      const dueDot = document.getElementById('dueIndicatorDot');
-      dueLabel.textContent = `Repasos (${dueCount})`;
-      dueDot.classList.toggle('hidden', dueCount === 0);
-
-      const pillDefs = [
-        { id: 'all', label: 'Todos', count: counts.all, dot: '#94a3b8' },
-        { id: 'f0', label: 'F0 Pendientes', count: counts.f0, dot: STATUS_CONFIG.f0.dot },
-        { id: 'f1', label: 'F1 Melodía', count: counts.f1, dot: STATUS_CONFIG.f1.dot },
-        { id: 'f2', label: 'F2 Armonía', count: counts.f2, dot: STATUS_CONFIG.f2.dot },
-        { id: 'f3', label: 'F3 Maduración', count: counts.f3, dot: STATUS_CONFIG.f3.dot },
-        { id: 'srs', label: 'Asimilados', count: counts.srs, dot: STATUS_CONFIG.srs.dot }
-      ];
-
-      const container = document.getElementById('filterPillsContainer');
-      container.innerHTML = pillDefs.map(p => {
-        const isSel = currentFilter === p.id;
-        const activeClass = isSel 
-          ? 'bg-surface-700 text-white border-surface-400 font-semibold' 
-          : 'bg-surface-900 hover:bg-surface-850 text-surface-400 border-surface-800';
-
-        return `
-          <button data-filter="${p.id}" class="tap-active pill-btn flex items-center gap-1.5 px-2.5 py-1 rounded border text-[11px] whitespace-nowrap transition-colors ${activeClass}">
-            <span class="w-1.5 h-1.5 rounded-full" style="background-color: ${p.dot}"></span>
-            <span>${p.label}</span>
-            <span class="opacity-60 text-[10px]">(${p.count})</span>
-          </button>
-        `;
-      }).join('');
-
-      container.querySelectorAll('.pill-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          currentFilter = btn.dataset.filter;
-          renderApp();
-        });
-      });
-    }
-
-    // 2. Renderizado de lista de standards con selector de estado directo
-    function renderList() {
-      const container = document.getElementById('standardsContainer');
-      const empty = document.getElementById('emptyView');
-      const q = searchQuery.trim().toLowerCase();
-
-      // Filtrar
-      let filtered = standards.filter(std => {
-        if (currentFilter === 'due') {
-          if (!isDue(std)) return false;
-        } else if (currentFilter !== 'all') {
-          if (std.status !== currentFilter) return false;
-        }
-
-        if (q) {
-          const mTitle = (std.title || '').toLowerCase().includes(q);
-          const mKey = (std.keyConcert || '').toLowerCase().includes(q) || (std.keyTransposed || '').toLowerCase().includes(q);
-          const mForm = (std.form || '').toLowerCase().includes(q);
-          const mNotes = (std.notes || '').toLowerCase().includes(q);
-          if (!mTitle && !mKey && !mForm && !mNotes) return false;
-        }
-
-        return true;
-      });
-
-      // Ordenar
-      filtered.sort((a, b) => {
-        if (sortMode === 'alpha') {
-          return a.title.localeCompare(b.title);
-        } else if (sortMode === 'status') {
-          const rank = { f1: 1, f2: 2, f3: 3, srs: 4, f0: 5 };
-          return (rank[a.status] || 9) - (rank[b.status] || 9);
-        } else if (sortMode === 'tempo') {
-          return (b.tempo || 0) - (a.tempo || 0);
-        } else if (sortMode === 'due') {
-          const dueA = isDue(a) ? 1 : 0;
-          const dueB = isDue(b) ? 1 : 0;
-          return dueB - dueA;
-        }
-        return 0;
-      });
-
-      if (filtered.length === 0) {
-        container.innerHTML = '';
-        empty.classList.remove('hidden');
-        return;
-      }
-
-      empty.classList.add('hidden');
-
-      container.innerHTML = filtered.map(std => {
-        const isExp = expandedId === std.id;
-        const cfg = STATUS_CONFIG[std.status] || STATUS_CONFIG.f0;
-        const stdDue = isDue(std);
-
-        return `
-          <div class="border ${isExp ? 'border-surface-600 bg-surface-850' : 'border-surface-800/80 bg-surface-900/90 hover:bg-surface-850/60'} rounded transition-colors overflow-hidden">
-            <!-- Fila Principal Compacta -->
-            <div class="px-2.5 py-2 flex items-center justify-between gap-2.5 cursor-pointer select-none" onclick="toggleRow('${std.id}')">
-              
-              <div class="flex items-center gap-2.5 min-w-0">
-                <span class="w-1.5 h-5 rounded-full shrink-0" style="background-color: ${cfg.dot}"></span>
-                
-                <div class="min-w-0">
-                  <div class="flex items-center gap-1.5 truncate">
-                    <span class="text-xs sm:text-sm font-semibold text-white tracking-tight truncate">${escapeHtml(std.title)}</span>
-                    ${stdDue ? `<span class="shrink-0 text-[8px] font-mono font-bold px-1 py-0.2 rounded bg-emerald-950 border border-emerald-500/80 text-emerald-300">SRS HOY</span>` : ''}
-                  </div>
-                  <div class="flex items-center gap-2 text-[10px] font-mono text-surface-400 mt-0.2">
-                    <span class="text-surface-200 font-medium">${escapeHtml(std.keyConcert || '—')}</span>
-                    ${std.keyTransposed ? `<span class="opacity-70">(${escapeHtml(std.keyTransposed)})</span>` : ''}
-                    <span>•</span>
-                    <span class="truncate opacity-80">${escapeHtml(std.form || 'Std')}</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Metadatos y Barra de Cambio Rápido de Estado -->
-              <div class="flex items-center gap-2 shrink-0">
-                <div class="hidden sm:block text-right font-mono">
-                  <div class="text-[11px] text-surface-200 font-medium">${std.tempo ? `${std.tempo} <span class="text-[9px] text-surface-400">BPM</span>` : '—'}</div>
-                </div>
-
-                <!-- Botonera Rápida de Nivel (0, 1, 2, 3, Asim) -->
-                <div class="flex items-center p-0.5 rounded bg-surface-950 border border-surface-800 text-[9px] font-mono" onclick="event.stopPropagation()">
-                  <button onclick="changeStatus('${std.id}', 'f0')" title="Fase 0: Pendientes" class="px-1.5 py-0.5 rounded ${std.status === 'f0' ? 'bg-surface-700 text-white font-bold' : 'text-surface-400 hover:text-white'}">0</button>
-                  <button onclick="changeStatus('${std.id}', 'f1')" title="Fase 1: Melodía" class="px-1.5 py-0.5 rounded ${std.status === 'f1' ? 'bg-amber-600 text-white font-bold' : 'text-surface-400 hover:text-amber-400'}">1</button>
-                  <button onclick="changeStatus('${std.id}', 'f2')" title="Fase 2: Armonía" class="px-1.5 py-0.5 rounded ${std.status === 'f2' ? 'bg-sky-600 text-white font-bold' : 'text-surface-400 hover:text-sky-400'}">2</button>
-                  <button onclick="changeStatus('${std.id}', 'f3')" title="Fase 3: Maduración" class="px-1.5 py-0.5 rounded ${std.status === 'f3' ? 'bg-purple-600 text-white font-bold' : 'text-surface-400 hover:text-purple-400'}">3</button>
-                  <button onclick="changeStatus('${std.id}', 'srs')" title="Asimilado (SRS)" class="px-1.5 py-0.5 rounded ${std.status === 'srs' ? 'bg-emerald-600 text-white font-bold' : 'text-surface-400 hover:text-emerald-400'}">✓</button>
-                </div>
-
-                <svg class="w-3.5 h-3.5 text-surface-400 transition-transform ${isExp ? 'rotate-180' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-              </div>
-            </div>
-
-            <!-- Panel Expandible de Detalles y Acciones SRS -->
-            ${isExp ? `
-              <div class="px-3 pb-3 pt-2 border-t border-surface-800 bg-surface-950/70 text-xs font-mono space-y-2.5">
-                ${std.notes ? `
-                  <div class="p-2 rounded bg-surface-900 border border-surface-800 text-[11px] text-surface-300 leading-relaxed">
-                    <span class="text-surface-400 block text-[9px] uppercase tracking-wider mb-0.5">Notas Técnicas</span>
-                    ${escapeHtml(std.notes)}
-                  </div>
-                ` : ''}
-
-                <!-- Si está Asimilado, mostrar acciones directas de Repetición Espaciada -->
-                ${std.status === 'srs' ? `
-                  <div class="p-2.5 rounded bg-emerald-950/30 border border-emerald-800/40 flex flex-wrap items-center justify-between gap-2">
-                    <div>
-                      <span class="text-[9px] uppercase tracking-wider text-emerald-400 block">Rueda SRS Activa</span>
-                      <span class="text-[11px] text-surface-200">Próximo repaso: <strong class="text-white">${std.nextReview || 'Hoy'}</strong> (Intervalo: ${std.srsInterval || 15} días)</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                      <button onclick="handleSRSReview('${std.id}', true)" class="tap-active px-2.5 py-1 rounded bg-emerald-900/50 hover:bg-emerald-800/70 border border-emerald-600 text-emerald-200 text-[10px] font-semibold">
-                        ✓ Sólido (×2 días)
-                      </button>
-                      <button onclick="handleSRSReview('${std.id}', false)" class="tap-active px-2.5 py-1 rounded bg-red-950/50 hover:bg-red-900/70 border border-red-700 text-red-200 text-[10px] font-semibold">
-                        ✕ Oxidado (Revisar en F3)
-                      </button>
-                    </div>
-                  </div>
-                ` : ''}
-
-                <div class="flex items-center justify-between pt-1 text-[11px]">
-                  <span class="text-surface-400">Tempo objetivo: ${std.tempo ? `${std.tempo} BPM` : 'No asignado'}</span>
-                  <button onclick="openEditModal('${std.id}')" class="text-surface-300 hover:text-white underline">Editar ficha</button>
-                </div>
-              </div>
-            ` : ''}
-          </div>
-        `;
-      }).join('');
-    }
-
-    /* =========================================================================
-       CONTROLADORES DE ESTADO
-       ========================================================================= */
-    window.toggleRow = function(id) {
-      expandedId = (expandedId === id) ? null : id;
-      renderList();
-    };
-
-    window.changeStatus = function(id, nextStatus) {
-      const std = standards.find(s => s.id === id);
-      if (!std) return;
-
-      std.status = nextStatus;
-      if (nextStatus === 'srs') {
-        std.srsInterval = std.srsInterval || 15;
-        std.lastReviewed = getTodayString();
-        std.nextReview = addDays(std.lastReviewed, std.srsInterval);
-      }
-      saveData();
-      renderApp();
-    };
-
-    window.handleSRSReview = function(id, passed) {
-      const std = standards.find(s => s.id === id);
-      if (!std) return;
-
-      const today = getTodayString();
-      std.lastReviewed = today;
-
-      if (passed) {
-        // Multiplicar intervalo por 2 (15 -> 30 -> 60 -> 120 días)
-        const current = std.srsInterval || 15;
-        std.srsInterval = Math.min(180, Math.round(current * 2));
-        std.nextReview = addDays(today, std.srsInterval);
-      } else {
-        // Degradar a Fase 3 y revisión semanal
-        std.status = 'f3';
-        std.srsInterval = 7;
-        std.nextReview = addDays(today, 7);
-      }
-
-      saveData();
-      renderApp();
-    };
-
-    /* =========================================================================
-       RULETAS DE AZAR (ESTUDIO ACTIVO VS EN FRÍO)
-       ========================================================================= */
-    const rouletteModal = document.getElementById('rouletteModal');
-    let currentRouletteGroup = 'study'; // 'study' | 'jam'
-
-    function triggerRoulette(group) {
-      currentRouletteGroup = group;
-      rouletteModal.classList.remove('hidden');
-
-      const isStudy = group === 'study';
-      document.getElementById('rouletteIcon').textContent = isStudy ? '🎲' : '⚡';
-      document.getElementById('rouletteTitleHeading').textContent = isStudy 
-        ? 'Estudio Activo (Fases 1, 2, 3)' 
-        : 'Estudio en Frío (Repertorio Asimilado)';
-
-      rollStandard();
-    }
-
-    function rollStandard() {
-      let pool = [];
-      if (currentRouletteGroup === 'study') {
-        pool = standards.filter(s => ['f1', 'f2', 'f3'].includes(s.status));
-      } else {
-        pool = standards.filter(s => s.status === 'srs');
-      }
-
-      const resultBox = document.getElementById('rouletteResultBox');
-      const emptyMsg = document.getElementById('rouletteEmptyMsg');
-
-      if (pool.length === 0) {
-        resultBox.classList.add('hidden');
-        emptyMsg.classList.remove('hidden');
-        emptyMsg.textContent = currentRouletteGroup === 'study'
-          ? 'No hay temas en Fases 1, 2 o 3. Promueve algunos standards desde Backlog para iniciar el estudio.'
-          : 'Aún no tienes standards en el estado Asimilado.';
-        return;
-      }
-
-      emptyMsg.classList.add('hidden');
-      resultBox.classList.remove('hidden');
-
-      const chosen = pool[Math.floor(Math.random() * pool.length)];
-      const challenge = STUDY_CHALLENGES[Math.floor(Math.random() * STUDY_CHALLENGES.length)];
-      const cfg = STATUS_CONFIG[chosen.status] || STATUS_CONFIG.f0;
-
-      const badge = document.getElementById('roulettePhaseBadge');
-      badge.textContent = cfg.label;
-      badge.className = `text-[10px] font-mono px-1.5 py-0.5 rounded border ${cfg.badge}`;
-
-      document.getElementById('rouletteStdName').textContent = chosen.title;
-      document.getElementById('rouletteKeyPill').textContent = chosen.keyConcert || 'Tono concert';
-      document.getElementById('rouletteFormPill').textContent = chosen.form || 'Std';
-      document.getElementById('rouletteTempoPill').textContent = chosen.tempo ? `${chosen.tempo} BPM` : 'Tempo libre';
-      document.getElementById('rouletteChallenge').textContent = challenge;
-    }
-
-    /* =========================================================================
-       MODAL DE EDICIÓN / ALTA
-       ========================================================================= */
-    const detailModal = document.getElementById('detailModal');
-    const form = document.getElementById('editStandardForm');
-    const btnDelete = document.getElementById('btnDeleteStd');
-
-    function openNewModal() {
-      document.getElementById('modalHeadTitle').textContent = 'Nuevo Standard';
-      document.getElementById('editId').value = '';
-      form.reset();
-      document.getElementById('editStatus').value = 'f0';
-      btnDelete.classList.add('hidden');
-      detailModal.classList.remove('hidden');
-      document.getElementById('editTitle').focus();
-    }
-
-    window.openEditModal = function(id) {
-      const std = standards.find(s => s.id === id);
-      if (!std) return;
-
-      document.getElementById('modalHeadTitle').textContent = 'Editar Standard';
-      document.getElementById('editId').value = std.id;
-      document.getElementById('editTitle').value = std.title || '';
-      document.getElementById('editKeyConcert').value = std.keyConcert || '';
-      document.getElementById('editKeyTransposed').value = std.keyTransposed || '';
-      document.getElementById('editForm').value = std.form || '';
-      document.getElementById('editTempo').value = std.tempo || '';
-      document.getElementById('editStatus').value = std.status || 'f0';
-      document.getElementById('editNotes').value = std.notes || '';
-
-      btnDelete.classList.remove('hidden');
-      detailModal.classList.remove('hidden');
-    };
-
-    function closeDetailModal() {
-      detailModal.classList.add('hidden');
-      form.reset();
-    }
-
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const id = document.getElementById('editId').value;
-      const title = document.getElementById('editTitle').value.trim();
-      const keyConcert = document.getElementById('editKeyConcert').value.trim();
-      const keyTransposed = document.getElementById('editKeyTransposed').value.trim();
-      const formVal = document.getElementById('editForm').value.trim();
-      const tempo = parseInt(document.getElementById('editTempo').value, 10) || null;
-      const status = document.getElementById('editStatus').value;
-      const notes = document.getElementById('editNotes').value.trim();
-
-      if (!title || !keyConcert) return;
-
-      if (id) {
-        const std = standards.find(s => s.id === id);
-        if (std) {
-          const wasSrs = std.status === 'srs';
-          std.title = title;
-          std.keyConcert = keyConcert;
-          std.keyTransposed = keyTransposed;
-          std.form = formVal;
-          std.tempo = tempo;
-          std.status = status;
-          std.notes = notes;
-
-          if (status === 'srs' && !wasSrs) {
-            std.srsInterval = std.srsInterval || 15;
-            std.lastReviewed = getTodayString();
-            std.nextReview = addDays(std.lastReviewed, std.srsInterval);
-          }
-        }
-      } else {
-        const newStd = {
-          id: 'std_' + Date.now(),
-          title,
-          keyConcert,
-          keyTransposed,
-          form: formVal,
-          tempo,
-          status,
-          notes,
-          srsInterval: status === 'srs' ? 15 : 0,
-          lastReviewed: status === 'srs' ? getTodayString() : null,
-          nextReview: status === 'srs' ? addDays(getTodayString(), 15) : null
-        };
-        standards.unshift(newStd);
-      }
-
-      saveData();
-      closeDetailModal();
-      renderApp();
-    });
-
-    btnDelete.addEventListener('click', () => {
-      const id = document.getElementById('editId').value;
-      if (!id) return;
-      standards = standards.filter(s => s.id !== id);
-      if (expandedId === id) expandedId = null;
-      saveData();
-      closeDetailModal();
-      renderApp();
-    });
-
-    /* =========================================================================
-       IMPORTAR / EXPORTAR JSON & RESET
-       ========================================================================= */
-    function exportVault() {
-      const today = getTodayString();
-      const blob = new Blob([JSON.stringify(standards, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `repertorio_standards_${today}.json`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    }
-
-    function importVault(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = (evt) => {
-        try {
-          const parsed = JSON.parse(evt.target.result);
-          if (Array.isArray(parsed)) {
-            standards = parsed;
-            saveData();
-            renderApp();
-          }
-        } catch (err) {
-          console.error('Error importando JSON:', err);
-        }
-      };
-      reader.readAsText(file);
-      e.target.value = '';
-    }
-
-    function resetToMasterList() {
-      standards = MASTER_SEED.map(item => ({
-        id: item.id,
-        title: item.title,
-        keyConcert: item.key,
-        keyTransposed: '',
-        form: item.form,
-        tempo: item.tempo,
-        status: 'f0',
-        notes: item.notes,
-        srsInterval: 0,
-        lastReviewed: null,
-        nextReview: null
-      }));
-      saveData();
-      renderApp();
-    }
-
-    function escapeHtml(str) {
-      if (!str) return '';
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
-    }
-
-    /* =========================================================================
-       EVENT LISTENERS
-       ========================================================================= */
-    document.addEventListener('DOMContentLoaded', () => {
-      loadData();
-      renderApp();
-
-      // Búsqueda en vivo
-      document.getElementById('searchInput').addEventListener('input', (e) => {
-        searchQuery = e.target.value;
-        renderList();
-      });
-
-      // Ordenación
-      document.getElementById('sortSelect').addEventListener('change', (e) => {
-        sortMode = e.target.value;
-        renderList();
-      });
-
-      // Filtro de repasos pendientes
-      document.getElementById('btnFilterDueToday').addEventListener('click', () => {
-        currentFilter = (currentFilter === 'due') ? 'all' : 'due';
-        renderApp();
-      });
-
-      // Botonera de estudio
-      document.getElementById('btnStudyRoll').addEventListener('click', () => triggerRoulette('study'));
-      document.getElementById('btnJamRoll').addEventListener('click', () => triggerRoulette('jam'));
-      document.getElementById('btnSpinAgain').addEventListener('click', rollStandard);
-      document.getElementById('btnCloseRoulette').addEventListener('click', () => rouletteModal.classList.add('hidden'));
-
-      // Modales
-      document.getElementById('btnOpenNew').addEventListener('click', openNewModal);
-      document.getElementById('btnCloseDetailModal').addEventListener('click', closeDetailModal);
-      document.getElementById('btnCancelDetail').addEventListener('click', closeDetailModal);
-
-      // Backup & Reset
-      document.getElementById('btnHeaderExport').addEventListener('click', exportVault);
-      document.getElementById('headerImportInput').addEventListener('change', importVault);
-      document.getElementById('btnExportData').addEventListener('click', exportVault);
-      document.getElementById('importFileInput').addEventListener('change', importVault);
-      document.getElementById('btnResetVault').addEventListener('click', resetToMasterList);
-    });
-  </script>
-</body>
-</html>
+    .standard-card {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      padding: 0.65rem 0.85rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
