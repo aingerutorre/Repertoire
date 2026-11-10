@@ -24,7 +24,7 @@
     body {
       background-color: var(--bg);
       color: var(--text-main);
-      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -34,7 +34,7 @@
 
     header {
       border-bottom: 1px solid var(--card-border);
-      background-color: rgba(9, 10, 12, 0.9);
+      background-color: rgba(9, 10, 12, 0.95);
       position: sticky;
       top: 0;
       z-index: 30;
@@ -65,7 +65,7 @@
       background: var(--card-border);
       color: var(--text-muted);
     }
-    .btn-group { display: flex; gap: 0.5rem; align-items: center; }
+    .btn-group { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
     .btn {
       display: inline-flex;
       align-items: center;
@@ -79,6 +79,7 @@
       background: var(--card);
       color: var(--text-main);
       transition: all 0.15s ease;
+      touch-action: manipulation;
     }
     .btn:hover { background: #1c2027; border-color: #3b4252; }
     .btn-primary { background: var(--accent); color: #000; border-color: var(--accent); }
@@ -95,34 +96,23 @@
       gap: 1rem;
     }
 
-    .toolbar {
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-    }
-    .search-row {
-      display: flex;
-      gap: 0.5rem;
-    }
+    .toolbar { display: flex; flex-direction: column; gap: 0.75rem; }
+    .search-row { display: flex; gap: 0.5rem; }
     .input-text {
       flex: 1;
       background: var(--card);
       border: 1px solid var(--card-border);
       color: var(--text-main);
-      padding: 0.5rem 0.85rem;
+      padding: 0.55rem 0.85rem;
       border-radius: 6px;
       font-size: 0.85rem;
       outline: none;
     }
     .input-text:focus { border-color: var(--accent); }
 
-    .filter-chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.4rem;
-    }
+    .filter-chips { display: flex; flex-wrap: wrap; gap: 0.4rem; }
     .chip {
-      padding: 0.3rem 0.65rem;
+      padding: 0.35rem 0.65rem;
       font-size: 0.72rem;
       font-weight: 600;
       border-radius: 6px;
@@ -133,6 +123,7 @@
       display: inline-flex;
       align-items: center;
       gap: 0.4rem;
+      touch-action: manipulation;
     }
     .chip.active {
       background: var(--accent-muted);
@@ -144,7 +135,7 @@
       background: var(--card);
       border: 1px solid var(--card-border);
       border-radius: 8px;
-      padding: 1rem;
+      padding: 0.9rem 1rem;
       display: flex;
       flex-wrap: wrap;
       align-items: center;
@@ -152,11 +143,7 @@
       gap: 0.75rem;
     }
 
-    .standards-list {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
+    .standards-list { display: flex; flex-direction: column; gap: 0.5rem; }
     .standard-card {
       background: var(--card);
       border: 1px solid var(--card-border);
@@ -166,3 +153,510 @@
       flex-wrap: wrap;
       align-items: center;
       justify-content: space-between;
+      gap: 0.5rem;
+      cursor: pointer;
+    }
+    .standard-card:hover { border-color: #3b4252; }
+    .card-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      flex: 1;
+      min-width: 200px;
+    }
+    .card-title { font-size: 0.92rem; font-weight: 700; color: #fff; }
+    .card-meta {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .card-actions { display: flex; align-items: center; gap: 0.35rem; }
+    .level-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 4px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.72rem;
+      font-weight: 700;
+      border: 1px solid var(--card-border);
+      background: #181b20;
+      color: var(--text-muted);
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+    .level-btn:hover { background: #23272f; }
+    .level-btn.active-0 { background: #374151; color: #fff; border-color: #4b5563; }
+    .level-btn.active-1 { background: #1e3a8a; color: #93c5fd; border-color: #3b82f6; }
+    .level-btn.active-2 { background: #581c87; color: #d8b4fe; border-color: #a855f7; }
+    .level-btn.active-3 { background: #854d0e; color: #fde047; border-color: #eab308; }
+    .level-btn.active-4 { background: #064e3b; color: #6ee7b7; border-color: #10b981; }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+      padding: 1rem;
+    }
+    .modal-card {
+      background: #16191f;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      max-width: 480px;
+      width: 100%;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    footer {
+      border-top: 1px solid var(--card-border);
+      padding: 1rem;
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-inner">
+      <div class="brand-title mono">
+        REPERTORIO
+        <span id="total-badge" class="badge-count">0</span>
+      </div>
+      <div class="btn-group">
+        <button class="btn" onclick="exportJSON()">📥 Crear JSON</button>
+        <button class="btn" onclick="document.getElementById('import-input').click()">📤 Cargar JSON</button>
+        <input type="file" id="import-input" accept=".json" style="display:none" onchange="importJSON(event)">
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="toolbar">
+      <div class="search-row">
+        <input type="text" id="search-input" class="input-text" placeholder="Buscar standard, tonalidad o compás..." oninput="filterStandards()">
+        <button class="btn btn-primary" onclick="openNewModal()">+ Standard</button>
+      </div>
+
+      <div class="filter-chips">
+        <button class="chip active" onclick="setFilter('all', this)">Todos <span id="count-all" class="mono">0</span></button>
+        <button class="chip" onclick="setFilter('pending', this)">F0: Pendientes <span id="count-0" class="mono">0</span></button>
+        <button class="chip" onclick="setFilter('melody', this)">F1: Melodía <span id="count-1" class="mono">0</span></button>
+        <button class="chip" onclick="setFilter('harmony', this)">F2: Armonía <span id="count-2" class="mono">0</span></button>
+        <button class="chip" onclick="setFilter('maturation', this)">F3: Maduración <span id="count-3" class="mono">0</span></button>
+        <button class="chip" onclick="setFilter('assimilated', this)">✓ Asimilados <span id="count-4" class="mono">0</span></button>
+        <button class="chip" onclick="setFilter('srs-due', this)">⚠️ Repasos SRS <span id="count-due" class="mono">0</span></button>
+      </div>
+    </section>
+
+    <section class="roulette-panel">
+      <div>
+        <div style="font-weight:700; font-size:0.85rem;">Práctica Aleatoria</div>
+        <div style="font-size:0.72rem; color:var(--text-muted);">Sugerencia de estudio o jam en frío</div>
+      </div>
+      <div class="btn-group">
+        <button class="btn" onclick="spinRoulette('study')">🎲 Fases 1-3</button>
+        <button class="btn btn-primary" onclick="spinRoulette('cold')">⚡ En Frío (Asimilados)</button>
+      </div>
+    </section>
+
+    <section id="roulette-box" style="display:none; background:#181b20; border:1px solid #38bdf8; border-radius:6px; padding:0.85rem;"></section>
+
+    <section id="standards-container" class="standards-list"></section>
+  </main>
+
+  <div id="modal-overlay" class="modal-overlay" onclick="closeModalOnOutside(event)">
+    <div class="modal-card">
+      <div style="font-weight:700; font-size:1.05rem;" id="modal-title">Editar Standard</div>
+      <input type="hidden" id="edit-id">
+      <div>
+        <label style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:0.25rem;">Título</label>
+        <input type="text" id="edit-name" class="input-text" style="width:100%;">
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem;">
+        <div>
+          <label style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:0.25rem;">Tonalidad</label>
+          <input type="text" id="edit-key" class="input-text mono" style="width:100%;">
+        </div>
+        <div>
+          <label style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:0.25rem;">Forma</label>
+          <input type="text" id="edit-form" class="input-text mono" style="width:100%;">
+        </div>
+      </div>
+      <div>
+        <label style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:0.25rem;">Nivel de Asimilación</label>
+        <select id="edit-level" class="input-text" style="width:100%;">
+          <option value="pending">F0: Pendientes</option>
+          <option value="melody">F1: Melodía</option>
+          <option value="harmony">F2: Armonía</option>
+          <option value="maturation">F3: Maduración</option>
+          <option value="assimilated">✓ Asimilado</option>
+        </select>
+      </div>
+      <div style="display:flex; justify-content:space-between; margin-top:0.5rem;">
+        <button class="btn" style="color:var(--red); border-color:rgba(248,113,113,0.3);" onclick="deleteCurrentStandard()">Eliminar</button>
+        <div class="btn-group">
+          <button class="btn" onclick="closeModal()">Cancelar</button>
+          <button class="btn btn-primary" onclick="saveStandard()">Guardar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <button class="btn" style="font-size:0.7rem; padding:0.25rem 0.5rem;" onclick="resetToDefaults()">Restablecer catálogo inicial</button>
+  </footer>
+
+  <script>
+    const INITIAL_CATALOG = [
+      "Airegin","All Blues","All of Me","All of You","All or Nothing at All","All The Things You Are","Alone Together","Along Came Betty","Anthropology","April in Paris","Ask Me Now","Au Privave","Autumn in New York","Autumn Leaves","Bags' Groove","Beatrice","Beautiful Love","Bessie's Blues","Billie's Bounce","Black Orpheus","Bloomdido","Blue Bossa","Blue in Green","Blue Monk","Blue Train","Blues For Alice","Blues in the Closet","Body and Soul","Bolivia","Broadway","But Beautiful","But Not for Me","Buzzy","Bye Bye Blackbird","Birdlike","C Jam Blues","C.T.A.","Cantaloupe Island","Caravan","Ceora","Cheese Cake","Chelsea Bridge","Cherokee","A Child Is Born","Come Rain or Come Shine","Come Sunday","Con Alma","Confirmation","Corcovado","Cottontail","Crazeology","Darn That Dream","Days of Wine and Roses","Desafinado","Dewey Square","Dexterity","Dolphin Dance","Donna Lee","Don't Get Around Much Anymore","Doxy","East of the Sun","Easy to Love","Embraceable You","Epistrophy","Equinox","The Eternal Triangle","Everything Happens to Me","Evidence","Ev'ry Time We Say Goodbye","Falling Grace","Footprints","Four","Fried Bananas","Gentle Rain","Georgia on My Mind","Giant Steps","The Girl from Ipanema","Good Bait","Green Dolphin Street","Groovin' High","Half Nelson","Have You Met Miss Jones?","Here's That Rainy Day","Hi-Fly","Honeysuckle Rose","How Deep Is the Ocean","How High the Moon","How Insensitive","I Can't Get Started","I Could Write a Book","I Fall in Love Too Easily","I Got Rhythm","I Hear a Rhapsody","I Love You","I Mean You","I Remember You","I Should Care","I Thought About You","If I Should Lose You","If I Were a Bell","I'll Remember April","I'm Getting Sentimental Over You","Impressions","In a Mellow Tone","In a Sentimental Mood","In Your Own Sweet Way","Inner Urge","Invitation","It Could Happen to You","It's You or No One","Jitterbug Waltz","Joy Spring","Just Friends","Just in Time","Just One of Those Things","Just You, Just Me","Lady Bird","Laura","Like Someone in Love","Like Sonny","Limehouse Blues","Little Sunflower","Long Ago and Far Away","Love for Sale","Lover","Lover Man","Lullaby of Birdland","Maiden Voyage","Manha de Carnaval","Meditation","Minority","Misterioso","Moment's Notice","Monk's Dream","Moose the Mooch","The More I See You","Move","Mr. P.C.","My Favorite Things","My Funny Valentine","My Ideal","My Little Suede Shoes","My One and Only Love","My Romance","My Shining Hour","Naima","Nica's Dream","Night and Day","Night Has a Thousand Eyes","A Night in Tunisia","Nothing Personal","Now's the Time","Old Devil Moon","Old Folks","Oleo","On a Slow Boat to China","On Green Dolphin Street","On the Sunny Side of the Street","One Note Samba","Ornithology","Out of Nowhere","Pannonica","Peace","Pensativa","Pent Up House","Perdido","Polka Dots and Moonbeams","Prelude to a Kiss","Recorda-Me","Reflections","Relaxin' at Camarillo","Rhythm-a-Ning","Room 608","Round Midnight","Ruby, My Dear","San-Du","Satin Doll","Scrapple from the Apple","Secret Love","Serpent's Tooth","Seven Come Eleven","Seven Steps to Heaven","Sidewinder","Skylark","So What","Softly, As in a Morning Sunrise","Solar","Some Day My Prince Will Come","Some Other Blues","Song for My Father","The Song Is You","Sonnymoon for Two","Soul Eyes","Speak Low","Speak No Evil","Spring Can Really Hang You Up the Most","St. Thomas","Stablemates","Star Eyes","Stella by Starlight","Stolen Moments","Straight, No Chaser","Sugar","Summertime","Take the 'A' Train","Tangerine","Tenderly","Tenor Madness","That's All","There Is No Greater Love","There Will Never Be Another You","This I Dig of You","The Touch of Your Lips","Triste","Tune Up","Turn Out the Stars","26-2","Up Jumped Spring","Upper Manhattan Medical Group","Voyage","Walking Shoes","Watermelon Man","Wave","Wee","Well You Needn't","When I Fall in Love","Whisper Not","Will You Still Be Mine","Woody 'n' You","Yardbird Suite","Yes or No","Yesterdays","You Stepped Out of a Dream","You'd Be So Nice to Come Home To"
+    ];
+
+    const STORAGE_KEY = "jazz_standards_vault_v4";
+    let standards = [];
+    let currentFilter = "all";
+
+    function init() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            standards = parsed.map((s, idx) => ({
+              id: s.id || `std_${idx}`,
+              title: s.title || "Sin título",
+              key: s.key || "",
+              form: s.form || "AABA",
+              level: ["pending", "melody", "harmony", "maturation", "assimilated"].includes(s.level) ? s.level : "pending",
+              srsInterval: Number(s.srsInterval) || 15,
+              nextReview: s.nextReview || null
+            }));
+          } else {
+            loadDefaults();
+          }
+        } else {
+          loadDefaults();
+        }
+      } catch (err) {
+        console.error("Error al cargar localStorage:", err);
+        loadDefaults();
+      }
+      render();
+    }
+
+    function loadDefaults() {
+      standards = INITIAL_CATALOG.map((title, i) => ({
+        id: "std_" + (i + 1),
+        title: title,
+        key: "",
+        form: "AABA",
+        level: "pending",
+        srsInterval: 15,
+        nextReview: null
+      }));
+      save();
+    }
+
+    function resetToDefaults() {
+      if (confirm("¿Restablecer todo el repertorio al catálogo inicial?")) {
+        loadDefaults();
+        render();
+      }
+    }
+
+    function save() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(standards));
+      } catch (e) {
+        console.error("Error guardando en localStorage:", e);
+      }
+    }
+
+    function updateCounts() {
+      const counts = { pending: 0, melody: 0, harmony: 0, maturation: 0, assimilated: 0, due: 0 };
+      const today = new Date().toISOString().split('T')[0];
+
+      standards.forEach(s => {
+        if (counts[s.level] !== undefined) counts[s.level]++;
+        if (s.level === 'assimilated' && s.nextReview && s.nextReview <= today) {
+          counts.due++;
+        }
+      });
+
+      const totalEl = document.getElementById("total-badge");
+      if (totalEl) totalEl.textContent = standards.length;
+      const countAll = document.getElementById("count-all");
+      if (countAll) countAll.textContent = standards.length;
+
+      document.getElementById("count-0").textContent = counts.pending;
+      document.getElementById("count-1").textContent = counts.melody;
+      document.getElementById("count-2").textContent = counts.harmony;
+      document.getElementById("count-3").textContent = counts.maturation;
+      document.getElementById("count-4").textContent = counts.assimilated;
+      document.getElementById("count-due").textContent = counts.due;
+    }
+
+    function setFilter(filter, el) {
+      currentFilter = filter;
+      document.querySelectorAll(".chip").forEach(c => c.classList.remove("active"));
+      if (el) el.classList.add("active");
+      renderList();
+    }
+
+    function filterStandards() {
+      renderList();
+    }
+
+    function setLevel(id, newLevel, e) {
+      if (e) e.stopPropagation();
+      const item = standards.find(s => s.id === id);
+      if (!item) return;
+
+      item.level = newLevel;
+      if (newLevel === "assimilated" && !item.nextReview) {
+        item.srsInterval = 15;
+        const d = new Date();
+        d.setDate(d.getDate() + 15);
+        item.nextReview = d.toISOString().split('T')[0];
+      }
+      save();
+      render();
+    }
+
+    function srsReview(id, status, e) {
+      if (e) e.stopPropagation();
+      const item = standards.find(s => s.id === id);
+      if (!item) return;
+
+      const d = new Date();
+      if (status === "solid") {
+        item.srsInterval = Math.round((item.srsInterval || 15) * 2);
+        d.setDate(d.getDate() + item.srsInterval);
+        item.nextReview = d.toISOString().split('T')[0];
+      } else {
+        item.level = "maturation";
+        item.srsInterval = 7;
+        d.setDate(d.getDate() + 7);
+        item.nextReview = d.toISOString().split('T')[0];
+      }
+      save();
+      render();
+    }
+
+    function renderList() {
+      const container = document.getElementById("standards-container");
+      if (!container) return;
+
+      const searchInput = document.getElementById("search-input");
+      const search = searchInput ? (searchInput.value || "").toLowerCase().trim() : "";
+      const today = new Date().toISOString().split('T')[0];
+
+      const filtered = standards.filter(s => {
+        const matchesSearch = s.title.toLowerCase().includes(search) || (s.key && s.key.toLowerCase().includes(search));
+        if (!matchesSearch) return false;
+
+        if (currentFilter === "all") return true;
+        if (currentFilter === "srs-due") return s.level === "assimilated" && s.nextReview && s.nextReview <= today;
+        return s.level === currentFilter;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--text-muted); font-size:0.85rem;">No se encontraron standards.</div>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map(s => {
+        const isDue = s.level === "assimilated" && s.nextReview && s.nextReview <= today;
+        return `
+          <div class="standard-card" onclick="openEditModal('${s.id}')">
+            <div class="card-info">
+              <div class="card-title">${s.title}</div>
+              <div class="card-meta mono">
+                ${s.key ? `<span style="color:var(--accent);">${s.key}</span> •` : ''}
+                ${s.form ? `<span>${s.form}</span>` : ''}
+                ${s.level === 'assimilated' ? `
+                  <span style="color:${isDue ? 'var(--red)' : 'var(--text-muted)'}; margin-left:0.3rem;">
+                    ${isDue ? '⚠️ Repaso hoy' : `Repaso: ${s.nextReview || 'Programado'}`}
+                  </span>
+                ` : ''}
+              </div>
+            </div>
+            <div class="card-actions">
+              ${s.level === 'assimilated' ? `
+                <button class="btn" style="padding:0.25rem 0.5rem; font-size:0.7rem; color:var(--green); border-color:rgba(74,222,128,0.3);" onclick="srsReview('${s.id}', 'solid', event)">✓ Sólido</button>
+                <button class="btn" style="padding:0.25rem 0.5rem; font-size:0.7rem; color:var(--red); border-color:rgba(248,113,113,0.3);" onclick="srsReview('${s.id}', 'rusty', event)">✕ Oxidado</button>
+              ` : ''}
+              <button class="level-btn ${s.level === 'pending' ? 'active-0' : ''}" title="F0: Pendientes" onclick="setLevel('${s.id}', 'pending', event)">0</button>
+              <button class="level-btn ${s.level === 'melody' ? 'active-1' : ''}" title="F1: Melodía" onclick="setLevel('${s.id}', 'melody', event)">1</button>
+              <button class="level-btn ${s.level === 'harmony' ? 'active-2' : ''}" title="F2: Armonía" onclick="setLevel('${s.id}', 'harmony', event)">2</button>
+              <button class="level-btn ${s.level === 'maturation' ? 'active-3' : ''}" title="F3: Maduración" onclick="setLevel('${s.id}', 'maturation', event)">3</button>
+              <button class="level-btn ${s.level === 'assimilated' ? 'active-4' : ''}" title="✓ Asimilado" onclick="setLevel('${s.id}', 'assimilated', event)">✓</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function render() {
+      updateCounts();
+      renderList();
+    }
+
+    function spinRoulette(mode) {
+      let pool = [];
+      const challenges = [
+        "Tocar melodía e improvisar con metrónomo exclusivamente en 2 y 4.",
+        "Transportar melodía y guía armónica 1 tono arriba o abajo en frío.",
+        "Solo continuo a negras/corcheas marcando raíces y terceras en el instrumento.",
+        "Tempo límite: Tocar un 25% más rápido del tempo habitual.",
+        "Versión balada a tempo rubato manteniendo la armonía exacta."
+      ];
+
+      if (mode === "study") {
+        pool = standards.filter(s => ["melody", "harmony", "maturation"].includes(s.level));
+      } else {
+        pool = standards.filter(s => s.level === "assimilated");
+      }
+
+      const box = document.getElementById("roulette-box");
+      if (pool.length === 0) {
+        box.style.display = "block";
+        box.innerHTML = `<span style="font-size:0.85rem; color:var(--text-muted);">No hay standards en esta categoría para la ruleta.</span>`;
+        return;
+      }
+
+      const pick = pool[Math.floor(Math.random() * pool.length)];
+      const chal = challenges[Math.floor(Math.random() * challenges.length)];
+
+      box.style.display = "block";
+      box.innerHTML = `
+        <div style="font-size:0.75rem; color:var(--accent); font-weight:700; text-transform:uppercase;">${mode === 'study' ? 'Estudio Activo' : 'En Frío'}</div>
+        <div style="font-size:1.15rem; font-weight:800; color:#fff; margin:0.25rem 0;">${pick.title}</div>
+        <div style="font-size:0.8rem; color:var(--text-muted);">${chal}</div>
+      `;
+    }
+
+    function openEditModal(id) {
+      const s = standards.find(item => item.id === id);
+      if (!s) return;
+      document.getElementById("modal-title").textContent = "Editar Standard";
+      document.getElementById("edit-id").value = s.id;
+      document.getElementById("edit-name").value = s.title;
+      document.getElementById("edit-key").value = s.key || "";
+      document.getElementById("edit-form").value = s.form || "";
+      document.getElementById("edit-level").value = s.level;
+      document.getElementById("modal-overlay").style.display = "flex";
+    }
+
+    function openNewModal() {
+      document.getElementById("modal-title").textContent = "Nuevo Standard";
+      document.getElementById("edit-id").value = "";
+      document.getElementById("edit-name").value = "";
+      document.getElementById("edit-key").value = "";
+      document.getElementById("edit-form").value = "AABA";
+      document.getElementById("edit-level").value = "pending";
+      document.getElementById("modal-overlay").style.display = "flex";
+    }
+
+    function closeModal() {
+      document.getElementById("modal-overlay").style.display = "none";
+    }
+
+    function closeModalOnOutside(e) {
+      if (e.target.id === "modal-overlay") closeModal();
+    }
+
+    function saveStandard() {
+      const id = document.getElementById("edit-id").value;
+      const title = document.getElementById("edit-name").value.trim();
+      const key = document.getElementById("edit-key").value.trim();
+      const form = document.getElementById("edit-form").value.trim();
+      const level = document.getElementById("edit-level").value;
+
+      if (!title) return;
+
+      if (id) {
+        const item = standards.find(s => s.id === id);
+        if (item) {
+          item.title = title;
+          item.key = key;
+          item.form = form;
+          item.level = level;
+        }
+      } else {
+        standards.unshift({
+          id: "std_" + Date.now(),
+          title, key, form, level,
+          srsInterval: 15,
+          nextReview: null
+        });
+      }
+      save();
+      closeModal();
+      render();
+    }
+
+    function deleteCurrentStandard() {
+      const id = document.getElementById("edit-id").value;
+      if (!id) return;
+      if (confirm("¿Eliminar este standard de la lista?")) {
+        standards = standards.filter(s => s.id !== id);
+        save();
+        closeModal();
+        render();
+      }
+    }
+
+    function exportJSON() {
+      const today = new Date().toISOString().split('T')[0];
+      const filename = `repertorio_standards_${today}.json`;
+      const blob = new Blob([JSON.stringify(standards, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function importJSON(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        try {
+          const parsed = JSON.parse(evt.target.result);
+          if (Array.isArray(parsed)) {
+            standards = parsed;
+            save();
+            render();
+            alert("Repertorio cargado correctamente.");
+          }
+        } catch(err) {
+          alert("Error: Archivo JSON no válido.");
+        }
+      };
+      reader.readAsText(file);
+      e.target.value = "";
+    }
+
+    document.addEventListener("DOMContentLoaded", init);
+  </script>
+</body>
+</html>
