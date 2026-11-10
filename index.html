@@ -2,6 +2,9 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>REPERTORIO</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -420,42 +423,58 @@ async function saveToDrive() {
   }
 }
 
-    async function loadFromDrive() {
-      const btn = document.getElementById("btn-load-drive");
-      const originalText = btn.innerHTML;
-      btn.innerHTML = "⏳ Conectando...";
-      btn.disabled = true;
+ async function loadFromDrive() {
+  const btn = document.getElementById("btn-load-drive");
+  const originalText = btn.innerHTML;
+  btn.innerHTML = "⏳ Conectando...";
+  btn.disabled = true;
 
-      try {
-        const response = await fetch(SCRIPT_URL);
-        const data = await response.json();
+  try {
+    // Timestamp para forzar a Drive a devolver la versión más fresca
+    const urlConCacheBuster = SCRIPT_URL + (SCRIPT_URL.includes("?") ? "&" : "?") + "t=" + Date.now();
+    const response = await fetch(urlConCacheBuster, { method: "GET" });
+    const rawText = await response.text();
 
-        if (Array.isArray(data) && data.length > 0) {
-          if (confirm(`Se han encontrado ${data.length} standards en Drive. ¿Deseas cargarlos y actualizar tu repertorio local?`)) {
-            standards = data;
-            save();
-            render();
-            btn.innerHTML = "✓ Actualizado";
-          } else {
-            btn.innerHTML = originalText;
-          }
-        } else if (data.status === "empty") {
-          alert("No se encontró ningún archivo .json en la carpeta de Drive.");
-          btn.innerHTML = originalText;
-        } else {
-          alert("Formato no reconocido en el archivo de Drive.");
-          btn.innerHTML = originalText;
-        }
-      } catch (err) {
-        alert("No se pudo cargar desde Drive: " + err.message);
-        btn.innerHTML = originalText;
-      } finally {
-        setTimeout(() => {
-          btn.innerHTML = originalText;
-          btn.disabled = false;
-        }, 2500);
-      }
+    let payload;
+    try {
+      payload = JSON.parse(rawText);
+    } catch (e) {
+      throw new Error("Respuesta no válida del servidor.");
     }
+
+    let lista = null;
+    let nombreArchivo = "respaldo";
+
+    if (Array.isArray(payload)) {
+      lista = payload;
+    } else if (payload && Array.isArray(payload.standards)) {
+      lista = payload.standards;
+      if (payload.fileName) nombreArchivo = payload.fileName;
+    } else if (payload && payload.status === "empty") {
+      alert("No se encontró ningún archivo .json en tu carpeta de Drive.");
+      return;
+    }
+
+    if (lista && lista.length > 0) {
+      if (confirm(`Se han localizado ${lista.length} standards (${nombreArchivo}).\n¿Deseas sincronizar y actualizar tu repertorio local?`)) {
+        standards = lista;
+        save();
+        render();
+        btn.innerHTML = "✓ Sincronizado";
+      }
+    } else {
+      alert("El archivo de Drive no contiene standards válidos.");
+    }
+
+  } catch (err) {
+    alert("Error al cargar desde Drive: " + err.message);
+  } finally {
+    setTimeout(() => {
+      btn.innerHTML = originalText;
+      btn.disabled = false;
+    }, 2000);
+  }
+}
 
     function updateCounts() {
       const counts = { pending: 0, melody: 0, harmony: 0, maturation: 0, assimilated: 0, due: 0 };
