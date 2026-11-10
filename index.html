@@ -65,12 +65,12 @@
       background: var(--card-border);
       color: var(--text-muted);
     }
-    .btn-group { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+    .btn-group { display: flex; gap: 0.45rem; align-items: center; flex-wrap: wrap; }
     .btn {
       display: inline-flex;
       align-items: center;
       gap: 0.4rem;
-      padding: 0.4rem 0.75rem;
+      padding: 0.4rem 0.7rem;
       border-radius: 6px;
       font-size: 0.75rem;
       font-weight: 600;
@@ -84,6 +84,8 @@
     .btn:hover { background: #1c2027; border-color: #3b4252; }
     .btn-primary { background: var(--accent); color: #000; border-color: var(--accent); }
     .btn-primary:hover { opacity: 0.9; }
+    .btn-drive { background: #1e293b; color: #38bdf8; border-color: rgba(56, 189, 248, 0.4); }
+    .btn-drive:hover { background: #283548; }
 
     main {
       flex: 1;
@@ -240,6 +242,8 @@
         <span id="total-badge" class="badge-count">0</span>
       </div>
       <div class="btn-group">
+        <button id="btn-save-drive" class="btn btn-drive" onclick="saveToDrive()">☁️ Guardar en Drive</button>
+        <button id="btn-load-drive" class="btn btn-drive" onclick="loadFromDrive()">☁️ Cargar de Drive</button>
         <button class="btn" onclick="exportJSON()">📥 Crear JSON</button>
         <button class="btn" onclick="document.getElementById('import-input').click()">📤 Cargar JSON</button>
         <input type="file" id="import-input" accept=".json" style="display:none" onchange="importJSON(event)">
@@ -324,11 +328,13 @@
   </footer>
 
   <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby5uTK2eXt001Jdudx-zQbe1WcddeO_IEpkzHiM6xX8377Zu87nSjZQwIPezi9CsoDY/exec";
+
     const INITIAL_CATALOG = [
       "Airegin","All Blues","All of Me","All of You","All or Nothing at All","All The Things You Are","Alone Together","Along Came Betty","Anthropology","April in Paris","Ask Me Now","Au Privave","Autumn in New York","Autumn Leaves","Bags' Groove","Beatrice","Beautiful Love","Bessie's Blues","Billie's Bounce","Black Orpheus","Bloomdido","Blue Bossa","Blue in Green","Blue Monk","Blue Train","Blues For Alice","Blues in the Closet","Body and Soul","Bolivia","Broadway","But Beautiful","But Not for Me","Buzzy","Bye Bye Blackbird","Birdlike","C Jam Blues","C.T.A.","Cantaloupe Island","Caravan","Ceora","Cheese Cake","Chelsea Bridge","Cherokee","A Child Is Born","Come Rain or Come Shine","Come Sunday","Con Alma","Confirmation","Corcovado","Cottontail","Crazeology","Darn That Dream","Days of Wine and Roses","Desafinado","Dewey Square","Dexterity","Dolphin Dance","Donna Lee","Don't Get Around Much Anymore","Doxy","East of the Sun","Easy to Love","Embraceable You","Epistrophy","Equinox","The Eternal Triangle","Everything Happens to Me","Evidence","Ev'ry Time We Say Goodbye","Falling Grace","Footprints","Four","Fried Bananas","Gentle Rain","Georgia on My Mind","Giant Steps","The Girl from Ipanema","Good Bait","Green Dolphin Street","Groovin' High","Half Nelson","Have You Met Miss Jones?","Here's That Rainy Day","Hi-Fly","Honeysuckle Rose","How Deep Is the Ocean","How High the Moon","How Insensitive","I Can't Get Started","I Could Write a Book","I Fall in Love Too Easily","I Got Rhythm","I Hear a Rhapsody","I Love You","I Mean You","I Remember You","I Should Care","I Thought About You","If I Should Lose You","If I Were a Bell","I'll Remember April","I'm Getting Sentimental Over You","Impressions","In a Mellow Tone","In a Sentimental Mood","In Your Own Sweet Way","Inner Urge","Invitation","It Could Happen to You","It's You or No One","Jitterbug Waltz","Joy Spring","Just Friends","Just in Time","Just One of Those Things","Just You, Just Me","Lady Bird","Laura","Like Someone in Love","Like Sonny","Limehouse Blues","Little Sunflower","Long Ago and Far Away","Love for Sale","Lover","Lover Man","Lullaby of Birdland","Maiden Voyage","Manha de Carnaval","Meditation","Minority","Misterioso","Moment's Notice","Monk's Dream","Moose the Mooch","The More I See You","Move","Mr. P.C.","My Favorite Things","My Funny Valentine","My Ideal","My Little Suede Shoes","My One and Only Love","My Romance","My Shining Hour","Naima","Nica's Dream","Night and Day","Night Has a Thousand Eyes","A Night in Tunisia","Nothing Personal","Now's the Time","Old Devil Moon","Old Folks","Oleo","On a Slow Boat to China","On Green Dolphin Street","On the Sunny Side of the Street","One Note Samba","Ornithology","Out of Nowhere","Pannonica","Peace","Pensativa","Pent Up House","Perdido","Polka Dots and Moonbeams","Prelude to a Kiss","Recorda-Me","Reflections","Relaxin' at Camarillo","Rhythm-a-Ning","Room 608","Round Midnight","Ruby, My Dear","San-Du","Satin Doll","Scrapple from the Apple","Secret Love","Serpent's Tooth","Seven Come Eleven","Seven Steps to Heaven","Sidewinder","Skylark","So What","Softly, As in a Morning Sunrise","Solar","Some Day My Prince Will Come","Some Other Blues","Song for My Father","The Song Is You","Sonnymoon for Two","Soul Eyes","Speak Low","Speak No Evil","Spring Can Really Hang You Up the Most","St. Thomas","Stablemates","Star Eyes","Stella by Starlight","Stolen Moments","Straight, No Chaser","Sugar","Summertime","Take the 'A' Train","Tangerine","Tenderly","Tenor Madness","That's All","There Is No Greater Love","There Will Never Be Another You","This I Dig of You","The Touch of Your Lips","Triste","Tune Up","Turn Out the Stars","26-2","Up Jumped Spring","Upper Manhattan Medical Group","Voyage","Walking Shoes","Watermelon Man","Wave","Wee","Well You Needn't","When I Fall in Love","Whisper Not","Will You Still Be Mine","Woody 'n' You","Yardbird Suite","Yes or No","Yesterdays","You Stepped Out of a Dream","You'd Be So Nice to Come Home To"
     ];
 
-    const STORAGE_KEY = "jazz_standards_vault_v4";
+    const STORAGE_KEY = "jazz_standards_vault_v5";
     let standards = [];
     let currentFilter = "all";
 
@@ -385,6 +391,69 @@
         localStorage.setItem(STORAGE_KEY, JSON.stringify(standards));
       } catch (e) {
         console.error("Error guardando en localStorage:", e);
+      }
+    }
+
+    async function saveToDrive() {
+      const btn = document.getElementById("btn-save-drive");
+      const originalText = btn.innerHTML;
+      btn.innerHTML = "⏳ Guardando...";
+      btn.disabled = true;
+
+      try {
+        await fetch(SCRIPT_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "text/plain" },
+          body: JSON.stringify(standards)
+        });
+
+        btn.innerHTML = "✓ Guardado en Drive";
+        setTimeout(() => {
+          btn.innerHTML = originalText;
+          btn.disabled = false;
+        }, 3000);
+      } catch (err) {
+        alert("Error al conectar con Drive: " + err.message);
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+      }
+    }
+
+    async function loadFromDrive() {
+      const btn = document.getElementById("btn-load-drive");
+      const originalText = btn.innerHTML;
+      btn.innerHTML = "⏳ Conectando...";
+      btn.disabled = true;
+
+      try {
+        const response = await fetch(SCRIPT_URL);
+        const data = await response.json();
+
+        if (Array.isArray(data) && data.length > 0) {
+          if (confirm(`Se han encontrado ${data.length} standards en Drive. ¿Deseas cargarlos y actualizar tu repertorio local?`)) {
+            standards = data;
+            save();
+            render();
+            btn.innerHTML = "✓ Actualizado";
+          } else {
+            btn.innerHTML = originalText;
+          }
+        } else if (data.status === "empty") {
+          alert("No se encontró ningún archivo .json en la carpeta de Drive.");
+          btn.innerHTML = originalText;
+        } else {
+          alert("Formato no reconocido en el archivo de Drive.");
+          btn.innerHTML = originalText;
+        }
+      } catch (err) {
+        alert("No se pudo cargar desde Drive: " + err.message);
+        btn.innerHTML = originalText;
+      } finally {
+        setTimeout(() => {
+          btn.innerHTML = originalText;
+          btn.disabled = false;
+        }, 2500);
       }
     }
 
