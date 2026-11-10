@@ -60,6 +60,7 @@
       display: flex;
       align-items: center;
       gap: 0.6rem;
+      flex-wrap: wrap;
     }
     .badge-count {
       font-size: 0.75rem;
@@ -243,6 +244,7 @@
       <div class="brand-title mono">
         REPERTORIO
         <span id="total-badge" class="badge-count">0</span>
+        <span id="sync-indicator" style="font-size:0.68rem; color:var(--text-muted); font-weight:400; margin-left:0.4rem; opacity:0.85;"></span>
       </div>
       <div class="btn-group">
         <button id="btn-save-drive" class="btn btn-drive" onclick="saveToDrive()">☁️ Guardar en Drive</button>
@@ -332,14 +334,38 @@
 
   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzIBXnVD8tleVxzQVzBZQmUmgdPNQIFvXvmmhcwYl4X9JBRzQiJUsQiUUAmQj1henyq/exec";
-    
+    const STORAGE_KEY = "jazz_standards_vault_v5";
+    const SYNC_STORAGE_KEY = "jazz_repertoire_last_sync";
+
     const INITIAL_CATALOG = [
       "Airegin","All Blues","All of Me","All of You","All or Nothing at All","All The Things You Are","Alone Together","Along Came Betty","Anthropology","April in Paris","Ask Me Now","Au Privave","Autumn in New York","Autumn Leaves","Bags' Groove","Beatrice","Beautiful Love","Bessie's Blues","Billie's Bounce","Black Orpheus","Bloomdido","Blue Bossa","Blue in Green","Blue Monk","Blue Train","Blues For Alice","Blues in the Closet","Body and Soul","Bolivia","Broadway","But Beautiful","But Not for Me","Buzzy","Bye Bye Blackbird","Birdlike","C Jam Blues","C.T.A.","Cantaloupe Island","Caravan","Ceora","Cheese Cake","Chelsea Bridge","Cherokee","A Child Is Born","Come Rain or Come Shine","Come Sunday","Con Alma","Confirmation","Corcovado","Cottontail","Crazeology","Darn That Dream","Days of Wine and Roses","Desafinado","Dewey Square","Dexterity","Dolphin Dance","Donna Lee","Don't Get Around Much Anymore","Doxy","East of the Sun","Easy to Love","Embraceable You","Epistrophy","Equinox","The Eternal Triangle","Everything Happens to Me","Evidence","Ev'ry Time We Say Goodbye","Falling Grace","Footprints","Four","Fried Bananas","Gentle Rain","Georgia on My Mind","Giant Steps","The Girl from Ipanema","Good Bait","Green Dolphin Street","Groovin' High","Half Nelson","Have You Met Miss Jones?","Here's That Rainy Day","Hi-Fly","Honeysuckle Rose","How Deep Is the Ocean","How High the Moon","How Insensitive","I Can't Get Started","I Could Write a Book","I Fall in Love Too Easily","I Got Rhythm","I Hear a Rhapsody","I Love You","I Mean You","I Remember You","I Should Care","I Thought About You","If I Should Lose You","If I Were a Bell","I'll Remember April","I'm Getting Sentimental Over You","Impressions","In a Mellow Tone","In a Sentimental Mood","In Your Own Sweet Way","Inner Urge","Invitation","It Could Happen to You","It's You or No One","Jitterbug Waltz","Joy Spring","Just Friends","Just in Time","Just One of Those Things","Just You, Just Me","Lady Bird","Laura","Like Someone in Love","Like Sonny","Limehouse Blues","Little Sunflower","Long Ago and Far Away","Love for Sale","Lover","Lover Man","Lullaby of Birdland","Maiden Voyage","Manha de Carnaval","Meditation","Minority","Misterioso","Moment's Notice","Monk's Dream","Moose the Mooch","The More I See You","Move","Mr. P.C.","My Favorite Things","My Funny Valentine","My Ideal","My Little Suede Shoes","My One and Only Love","My Romance","My Shining Hour","Naima","Nica's Dream","Night and Day","Night Has a Thousand Eyes","A Night in Tunisia","Nothing Personal","Now's the Time","Old Devil Moon","Old Folks","Oleo","On a Slow Boat to China","On Green Dolphin Street","On the Sunny Side of the Street","One Note Samba","Ornithology","Out of Nowhere","Pannonica","Peace","Pensativa","Pent Up House","Perdido","Polka Dots and Moonbeams","Prelude to a Kiss","Recorda-Me","Reflections","Relaxin' at Camarillo","Rhythm-a-Ning","Room 608","Round Midnight","Ruby, My Dear","San-Du","Satin Doll","Scrapple from the Apple","Secret Love","Serpent's Tooth","Seven Come Eleven","Seven Steps to Heaven","Sidewinder","Skylark","So What","Softly, As in a Morning Sunrise","Solar","Some Day My Prince Will Come","Some Other Blues","Song for My Father","The Song Is You","Sonnymoon for Two","Soul Eyes","Speak Low","Speak No Evil","Spring Can Really Hang You Up the Most","St. Thomas","Stablemates","Star Eyes","Stella by Starlight","Stolen Moments","Straight, No Chaser","Sugar","Summertime","Take the 'A' Train","Tangerine","Tenderly","Tenor Madness","That's All","There Is No Greater Love","There Will Never Be Another You","This I Dig of You","The Touch of Your Lips","Triste","Tune Up","Turn Out the Stars","26-2","Up Jumped Spring","Upper Manhattan Medical Group","Voyage","Walking Shoes","Watermelon Man","Wave","Wee","Well You Needn't","When I Fall in Love","Whisper Not","Will You Still Be Mine","Woody 'n' You","Yardbird Suite","Yes or No","Yesterdays","You Stepped Out of a Dream","You'd Be So Nice to Come Home To"
     ];
 
-    const STORAGE_KEY = "jazz_standards_vault_v5";
     let standards = [];
     let currentFilter = "all";
+
+    function updateSyncTimestamp(timestampStr) {
+      const el = document.getElementById("sync-indicator");
+      if (!el) return;
+      const val = timestampStr || localStorage.getItem(SYNC_STORAGE_KEY);
+      if (val) {
+        el.textContent = `• Sync: ${val}`;
+      } else {
+        el.textContent = "";
+      }
+    }
+
+    function setSyncSuccess() {
+      const now = new Date();
+      const day = String(now.getDate()).padStart(2, '0');
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const hours = String(now.getHours()).padStart(2, '0');
+      const mins = String(now.getMinutes()).padStart(2, '0');
+      const formatted = `${day}/${month} ${hours}:${mins}`;
+      
+      localStorage.setItem(SYNC_STORAGE_KEY, formatted);
+      updateSyncTimestamp(formatted);
+    }
 
     function init() {
       try {
@@ -363,9 +389,10 @@
           loadDefaults();
         }
       } catch (err) {
-        console.error("Error al cargar localStorage:", err);
+        console.error("Error cargando localStorage:", err);
         loadDefaults();
       }
+      updateSyncTimestamp();
       render();
     }
 
@@ -397,84 +424,85 @@
       }
     }
 
-async function saveToDrive() {
-  const btn = document.getElementById("btn-save-drive");
-  const originalText = btn.innerHTML;
-  btn.innerHTML = "⏳ Guardando...";
-  btn.disabled = true;
+    async function saveToDrive() {
+      const btn = document.getElementById("btn-save-drive");
+      const originalText = btn.innerHTML;
+      btn.innerHTML = "⏳ Guardando...";
+      btn.disabled = true;
 
-  try {
-    await fetch(SCRIPT_URL, {
-      method: "POST",
-      mode: "no-cors",
-      headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify(standards)
-    });
+      try {
+        await fetch(SCRIPT_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(standards)
+        });
 
-    btn.innerHTML = "✓ Guardado en Drive";
-    alert("Petición de guardado enviada a Google Drive.");
-  } catch (err) {
-    alert("Error al enviar a Drive: " + err.message);
-  } finally {
-    setTimeout(() => {
-      btn.innerHTML = originalText;
-      btn.disabled = false;
-    }, 2000);
-  }
-}
-
- async function loadFromDrive() {
-  const btn = document.getElementById("btn-load-drive");
-  const originalText = btn.innerHTML;
-  btn.innerHTML = "⏳ Conectando...";
-  btn.disabled = true;
-
-  try {
-    // Timestamp para forzar a Drive a devolver la versión más fresca
-    const urlConCacheBuster = SCRIPT_URL + (SCRIPT_URL.includes("?") ? "&" : "?") + "t=" + Date.now();
-    const response = await fetch(urlConCacheBuster, { method: "GET" });
-    const rawText = await response.text();
-
-    let payload;
-    try {
-      payload = JSON.parse(rawText);
-    } catch (e) {
-      throw new Error("Respuesta no válida del servidor.");
-    }
-
-    let lista = null;
-    let nombreArchivo = "respaldo";
-
-    if (Array.isArray(payload)) {
-      lista = payload;
-    } else if (payload && Array.isArray(payload.standards)) {
-      lista = payload.standards;
-      if (payload.fileName) nombreArchivo = payload.fileName;
-    } else if (payload && payload.status === "empty") {
-      alert("No se encontró ningún archivo .json en tu carpeta de Drive.");
-      return;
-    }
-
-    if (lista && lista.length > 0) {
-      if (confirm(`Se han localizado ${lista.length} standards (${nombreArchivo}).\n¿Deseas sincronizar y actualizar tu repertorio local?`)) {
-        standards = lista;
-        save();
-        render();
-        btn.innerHTML = "✓ Sincronizado";
+        setSyncSuccess();
+        btn.innerHTML = "✓ Guardado";
+        alert("Petición de guardado enviada a Google Drive con éxito.");
+      } catch (err) {
+        alert("Error al enviar a Drive: " + err.message);
+      } finally {
+        setTimeout(() => {
+          btn.innerHTML = originalText;
+          btn.disabled = false;
+        }, 2000);
       }
-    } else {
-      alert("El archivo de Drive no contiene standards válidos.");
     }
 
-  } catch (err) {
-    alert("Error al cargar desde Drive: " + err.message);
-  } finally {
-    setTimeout(() => {
-      btn.innerHTML = originalText;
-      btn.disabled = false;
-    }, 2000);
-  }
-}
+    async function loadFromDrive() {
+      const btn = document.getElementById("btn-load-drive");
+      const originalText = btn.innerHTML;
+      btn.innerHTML = "⏳ Conectando...";
+      btn.disabled = true;
+
+      try {
+        const urlConCacheBuster = SCRIPT_URL + (SCRIPT_URL.includes("?") ? "&" : "?") + "t=" + Date.now();
+        const response = await fetch(urlConCacheBuster, { method: "GET" });
+        const rawText = await response.text();
+
+        let payload;
+        try {
+          payload = JSON.parse(rawText);
+        } catch (e) {
+          throw new Error("Respuesta no válida del servidor.");
+        }
+
+        let lista = null;
+        let nombreArchivo = "respaldo";
+
+        if (Array.isArray(payload)) {
+          lista = payload;
+        } else if (payload && Array.isArray(payload.standards)) {
+          lista = payload.standards;
+          if (payload.fileName) nombreArchivo = payload.fileName;
+        } else if (payload && payload.status === "empty") {
+          alert("No se encontró ningún archivo .json en tu carpeta de Drive.");
+          return;
+        }
+
+        if (lista && lista.length > 0) {
+          if (confirm(`Se han localizado ${lista.length} standards (${nombreArchivo}).\n¿Deseas sincronizar y actualizar tu repertorio local?`)) {
+            standards = lista;
+            save();
+            render();
+            setSyncSuccess();
+            btn.innerHTML = "✓ Sincronizado";
+          }
+        } else {
+          alert("El archivo de Drive no contiene standards válidos.");
+        }
+
+      } catch (err) {
+        alert("Error al cargar desde Drive: " + err.message);
+      } finally {
+        setTimeout(() => {
+          btn.innerHTML = originalText;
+          btn.disabled = false;
+        }, 2000);
+      }
+    }
 
     function updateCounts() {
       const counts = { pending: 0, melody: 0, harmony: 0, maturation: 0, assimilated: 0, due: 0 };
