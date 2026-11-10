@@ -249,6 +249,7 @@
       <div class="btn-group">
         <button id="btn-save-drive" class="btn btn-drive" onclick="saveToDrive()">☁️ Guardar en Drive</button>
         <button id="btn-load-drive" class="btn btn-drive" onclick="loadFromDrive()">☁️ Cargar de Drive</button>
+        <button class="btn" onclick="exportTextFile()">📄 Exportar TXT</button>
         <button class="btn" onclick="exportJSON()">📥 Crear JSON</button>
         <button class="btn" onclick="document.getElementById('import-input').click()">📤 Cargar JSON</button>
         <input type="file" id="import-input" accept=".json" style="display:none" onchange="importJSON(event)">
@@ -504,6 +505,94 @@
       }
     }
 
+    function exportTextFile() {
+      const today = new Date().toISOString().split('T')[0];
+      const activeLevels = [
+        { key: "melody", label: "F1: MELODÍA" },
+        { key: "harmony", label: "F2: ARMONÍA" },
+        { key: "maturation", label: "F3: MADURACIÓN" },
+        { key: "assimilated", label: "ASIMILADOS / EN ROTACIÓN SRS" }
+      ];
+
+      let totalActive = 0;
+      let lines = [
+        "==================================================",
+        "REPERTORIO DE STANDARDS - MADURACIÓN Y ASIMILADOS",
+        `Fecha: ${today}`,
+        "==================================================",
+        ""
+      ];
+
+      activeLevels.forEach(lvl => {
+        const items = standards.filter(s => s.level === lvl.key);
+        totalActive += items.length;
+
+        lines.push(`[ ${lvl.label} ] (Total: ${items.length})`);
+        lines.push("--------------------------------------------------");
+
+        if (items.length === 0) {
+          lines.push("  (Sin temas en esta fase)");
+        } else {
+          items.forEach(s => {
+            let meta = [];
+            if (s.key) meta.push(s.key);
+            if (s.form) meta.push(s.form);
+            const metaStr = meta.length > 0 ? ` [${meta.join(" - ")}]` : "";
+            const srsInfo = (lvl.key === "assimilated" && s.nextReview) ? ` (Próximo repaso: ${s.nextReview})` : "";
+            lines.push(`• ${s.title}${metaStr}${srsInfo}`);
+          });
+        }
+        lines.push("");
+      });
+
+      lines.push("==================================================");
+      lines.push(`TOTAL TEMAS EN ESTUDIO ACTIVO / ASIMILADOS: ${totalActive}`);
+      lines.push("==================================================");
+
+      const textContent = lines.join("\n");
+      const filename = `repertorio_madurez_${today}.txt`;
+      const blob = new Blob([textContent], { type: "text/plain;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function exportJSON() {
+      const today = new Date().toISOString().split('T')[0];
+      const filename = `repertorio_standards_${today}.json`;
+      const blob = new Blob([JSON.stringify(standards, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function importJSON(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        try {
+          const parsed = JSON.parse(evt.target.result);
+          if (Array.isArray(parsed)) {
+            standards = parsed;
+            save();
+            render();
+            alert("Repertorio cargado correctamente.");
+          }
+        } catch(err) {
+          alert("Error: Archivo JSON no válido.");
+        }
+      };
+      reader.readAsText(file);
+      e.target.value = "";
+    }
+
     function updateCounts() {
       const counts = { pending: 0, melody: 0, harmony: 0, maturation: 0, assimilated: 0, due: 0 };
       const today = new Date().toISOString().split('T')[0];
@@ -737,39 +826,6 @@
         closeModal();
         render();
       }
-    }
-
-    function exportJSON() {
-      const today = new Date().toISOString().split('T')[0];
-      const filename = `repertorio_standards_${today}.json`;
-      const blob = new Blob([JSON.stringify(standards, null, 2)], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = filename;
-      a.click();
-      URL.revokeObjectURL(url);
-    }
-
-    function importJSON(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function(evt) {
-        try {
-          const parsed = JSON.parse(evt.target.result);
-          if (Array.isArray(parsed)) {
-            standards = parsed;
-            save();
-            render();
-            alert("Repertorio cargado correctamente.");
-          }
-        } catch(err) {
-          alert("Error: Archivo JSON no válido.");
-        }
-      };
-      reader.readAsText(file);
-      e.target.value = "";
     }
 
     document.addEventListener("DOMContentLoaded", init);
