@@ -394,29 +394,34 @@
       }
     }
 
-    async function saveToDrive() {
+   async function saveToDrive() {
       const btn = document.getElementById("btn-save-drive");
       const originalText = btn.innerHTML;
       btn.innerHTML = "⏳ Guardando...";
       btn.disabled = true;
 
       try {
-        await fetch(SCRIPT_URL, {
+        const response = await fetch(SCRIPT_URL, {
           method: "POST",
-          mode: "no-cors",
-          headers: { "Content-Type": "text/plain" },
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
           body: JSON.stringify(standards)
         });
 
-        btn.innerHTML = "✓ Guardado en Drive";
+        const result = await response.json();
+
+        if (result && result.status === "success") {
+          btn.innerHTML = "✓ Guardado en Drive";
+          alert(`Guardado con éxito en Drive:\n${result.fileName}`);
+        } else {
+          throw new Error(result.message || "No se pudo guardar el archivo en Drive");
+        }
+      } catch (err) {
+        alert("Error al guardar en Drive: " + err.message);
+      } finally {
         setTimeout(() => {
           btn.innerHTML = originalText;
           btn.disabled = false;
-        }, 3000);
-      } catch (err) {
-        alert("Error al conectar con Drive: " + err.message);
-        btn.innerHTML = originalText;
-        btn.disabled = false;
+        }, 2000);
       }
     }
 
