@@ -271,9 +271,6 @@
       <div class="btn-group">
         <button id="btn-save-drive" class="btn btn-drive" onclick="saveToDrive()">☁️ Guardar en Drive</button>
         <button id="btn-load-drive" class="btn btn-drive" onclick="loadFromDrive()">☁️ Cargar de Drive</button>
-        <button class="btn" onclick="exportJSON()">📥 Crear JSON</button>
-        <button class="btn" onclick="document.getElementById('import-input').click()">📤 Cargar JSON</button>
-        <input type="file" id="import-input" accept=".json" style="display:none" onchange="importJSON(event)">
       </div>
     </div>
   </header>
@@ -551,48 +548,6 @@
       }
     }
 
-    function exportJSON() {
-      const today = new Date().toISOString().split('T')[0];
-      const filename = `repertorio_standards_${today}.json`;
-      const blob = new Blob([JSON.stringify(standards, null, 2)], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = filename;
-      a.click();
-      URL.revokeObjectURL(url);
-    }
-
-    function importJSON(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function(evt) {
-        try {
-          const parsed = JSON.parse(evt.target.result);
-          if (Array.isArray(parsed)) {
-            standards = parsed.map((s, idx) => ({
-              id: s.id || `std_${idx}`,
-              title: s.title || "Sin título",
-              key: s.key || "",
-              form: s.form || "AABA",
-              level: ["pending", "melody", "harmony", "maturation", "assimilated"].includes(s.level) ? s.level : "pending",
-              srsInterval: Number(s.srsInterval) || 15,
-              nextReview: s.nextReview || null,
-              notes: s.notes || ""
-            }));
-            save();
-            render();
-            alert("Repertorio cargado correctamente.");
-          }
-        } catch(err) {
-          alert("Error: Archivo JSON no válido.");
-        }
-      };
-      reader.readAsText(file);
-      e.target.value = "";
-    }
-
     function updateCounts() {
       const counts = { pending: 0, melody: 0, harmony: 0, maturation: 0, assimilated: 0, due: 0 };
       const today = new Date().toISOString().split('T')[0];
@@ -739,11 +694,48 @@
     function spinRoulette(mode) {
       let pool = [];
       const challenges = [
-        "Tocar melodía e improvisar con metrónomo exclusivamente en 2 y 4.",
-        "Transportar melodía y guía armónica 1 tono arriba o abajo en frío.",
-        "Solo continuo a negras/corcheas marcando raíces y terceras en el instrumento.",
-        "Tempo límite: Tocar un 25% más rápido del tempo habitual.",
-        "Versión balada a tempo rubato manteniendo la armonía exacta."
+      // Sintaxis Post-Bop, Poliacordes y Cromatismo
+        "Side-slipping: desplazar frases medio tono arriba o abajo de la armonía y resolver dentro.",
+        "Tétradas / estructuras superiores: improvisar usando pares de tríadas (triad pairs) sobre cada acorde.",
+        "Pares de intervalos: construir líneas exclusivamente mediante saltos de cuarta justa y quinta justa.",
+        "Líneas cromáticas continuas: conectar notas guía mediante escalas bebop o cromatismos sin saltos.",
+        "Sustituciones Coltrane.",
+        "Menor melódica.",
+        "Intervalos de cuartas.",
+        "Nota pivot: mantener una nota común (tónica o quinta del tema) como eje melódico durante toda una sección A.",
+        "Pentatónicas",
+
+        // Articulación, Dinámica y Sonido (Saxofón)
+        "Articulación invertida: ligar los tiempos débiles hacia los fuertes y picar solo las notas sincopadas.",
+        "Subtone y pianissimo: tocar la melodía y un chorus completo al mínimo volumen posible sin perder aire.",
+        "Crescendo estructural: empezar el chorus en ppp y llevar la intensidad hasta fff en el clímax del puente.",
+        "Notas fantasma (ghost notes): exagerar el contraste dinámico entre notas acentuadas y notas semi-apagadas.",
+        "Multifónicos o armónicos: integrar sobretonos o bifurcaciones tímbricas como puntos de tensión en el solo.",
+        "Frases extralargas",
+        "Concepto baterístico",
+        "Registro agudo",
+        "Registro grave",
+
+        // Fraseo, Tiempo y Métrica Avanzada
+        "Cross-bar phrasing: empezar y terminar todas las frases en mitad de compás, nunca en el tiempo 1.",
+        "Rubato interno: flotar sobre el pulso del metrónomo acelerando y frenando frases sin perder el compás.",
+        "Subdivisión de tresillos, quintillos o septillos",
+        "Tempo lento (40-50 BPM): tocar la melodía y el solo subdividiendo mentalmente a semicorcheas.",
+        "Medio tiempo (Half-time feel): improvisar con sensación de balada sobre un pulso rápido de swing.",
+        "Desplazamiento de la melodía",
+        "Elegir puntos de caídas de frases"
+
+        // Lenguaje, Transcripción y Repertorio Cruzado
+        "Cita temática: insertar obligatoriamente el motivo de otro standard conocido dentro de tu solo.",
+        "Contrafact instantáneo: improvisar una melodía nueva completa sobre los cambios sin tocar el tema original.",
+        "Enfoque Steve Grossman / Joe Henderson: frases angulares con saltos amplios y síncopas agresivas.",
+        "Enfoque Mark Turner / Ben Wendel: líneas largas en registro agudo, intervalos abiertos y poca vibración.",
+        "Walking bass.",
+        "Intercambio de 4s imaginario: tocar 4 compases de solo y 4 compases de acompañamiento rítmico (comping).",
+        "Improvisar una coda o turnaround extendido sin acompañamiento y resolver en calderón."
+        "Lenguaje: trabajar una pieza de lenguaje concreta aplicándola en diferentes contextos armónicos"
+        "Cromatismos a notas de los acordes"
+        "Melodic Cells"
       ];
 
       if (mode === "study") {
