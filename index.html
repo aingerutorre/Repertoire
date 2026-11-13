@@ -1019,7 +1019,7 @@
       if (e.target.id === overlayId) closeModal(overlayId);
     }
 
-    function saveStandard() {
+   function saveStandard() {
       const id = document.getElementById("edit-id").value;
       const title = document.getElementById("edit-name").value.trim();
       const key = document.getElementById("edit-key").value.trim();
@@ -1039,13 +1039,17 @@
           item.notes = notes;
         }
       } else {
-        standards.unshift({
+        standards.push({
           id: "std_" + Date.now(),
           title, key, form, level, notes,
           srsInterval: 15,
           nextReview: null
         });
       }
+
+      // Ordenar alfabéticamente toda la lista (A-Z)
+      standards.sort((a, b) => a.title.localeCompare(b.title, 'es', { sensitivity: 'base' }));
+
       save();
       closeModal("modal-overlay");
       render();
