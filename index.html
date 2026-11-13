@@ -21,6 +21,7 @@
       --accent-muted: rgba(56, 189, 248, 0.15);
       --green: #4ade80;
       --amber: #fbbf24;
+      --purple: #c084fc;
       --red: #f87171;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -53,14 +54,19 @@
       justify-content: space-between;
       gap: 0.75rem;
     }
+    .brand-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
     .brand-title {
       font-size: 1.15rem;
       font-weight: 800;
       letter-spacing: 0.08em;
       display: flex;
       align-items: center;
-      gap: 0.6rem;
-      flex-wrap: wrap;
+      gap: 0.5rem;
     }
     .badge-count {
       font-size: 0.75rem;
@@ -69,6 +75,32 @@
       background: var(--card-border);
       color: var(--text-muted);
     }
+
+    /* Navegación de pestañas */
+    .nav-tabs {
+      display: inline-flex;
+      background: #14171d;
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      padding: 0.2rem;
+      gap: 0.2rem;
+    }
+    .nav-tab {
+      padding: 0.35rem 0.75rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      border-radius: 4px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .nav-tab.active {
+      background: var(--accent-muted);
+      color: var(--accent);
+    }
+
     .btn-group { display: flex; gap: 0.45rem; align-items: center; flex-wrap: wrap; }
     .btn {
       display: inline-flex;
@@ -118,7 +150,7 @@
     .input-text:focus { border-color: var(--accent); }
     textarea.input-text {
       resize: vertical;
-      min-height: 95px;
+      min-height: 85px;
       line-height: 1.45;
     }
 
@@ -224,27 +256,120 @@
     .level-btn.active-3 { background: #854d0e; color: #fde047; border-color: #eab308; }
     .level-btn.active-4 { background: #064e3b; color: #6ee7b7; border-color: #10b981; }
 
+    /* Tarjetas de Técnica / Lenguaje */
+    .workshop-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 0.85rem;
+    }
+    .wk-card {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 0.9rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      justify-content: space-between;
+    }
+    .wk-card:hover { border-color: #3b4252; }
+    .wk-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+    .wk-badge {
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+      letter-spacing: 0.04em;
+    }
+    .wk-badge.technique { background: rgba(251, 191, 36, 0.15); color: var(--amber); border: 1px solid rgba(251, 191, 36, 0.3); }
+    .wk-badge.language { background: rgba(192, 132, 252, 0.15); color: var(--purple); border: 1px solid rgba(192, 132, 252, 0.3); }
+    .wk-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+    }
+    .wk-tag {
+      font-size: 0.68rem;
+      background: #1a1e26;
+      color: var(--accent);
+      padding: 0.1rem 0.4rem;
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .wk-body {
+      font-size: 0.8rem;
+      color: #cbd5e1;
+      white-space: pre-line;
+      line-height: 1.45;
+    }
+    .wk-img-wrap {
+      background: #f8fafc;
+      border-radius: 6px;
+      padding: 0.35rem;
+      cursor: zoom-in;
+      overflow: hidden;
+      border: 1px solid var(--card-border);
+    }
+    .wk-img-wrap img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 3px;
+    }
+
+    /* Zona de pegado de captura en Modal */
+    .paste-zone {
+      border: 1px dashed #3b4252;
+      background: #0f1115;
+      border-radius: 6px;
+      padding: 0.85rem;
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: border-color 0.15s;
+    }
+    .paste-zone:hover, .paste-zone.dragover {
+      border-color: var(--accent);
+      color: var(--text-main);
+    }
+    .paste-preview {
+      max-height: 180px;
+      max-width: 100%;
+      border-radius: 4px;
+      margin-top: 0.5rem;
+      border: 1px solid var(--card-border);
+    }
+
     .modal-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.75);
+      background: rgba(0, 0, 0, 0.8);
       backdrop-filter: blur(4px);
       display: none;
       align-items: center;
       justify-content: center;
       z-index: 50;
       padding: 1rem;
+      overflow-y: auto;
     }
     .modal-card {
       background: #16191f;
       border: 1px solid var(--card-border);
       border-radius: 8px;
-      max-width: 500px;
+      max-width: 520px;
       width: 100%;
       padding: 1.25rem;
       display: flex;
       flex-direction: column;
-      gap: 0.9rem;
+      gap: 0.85rem;
+      margin: auto;
     }
 
     footer {
@@ -263,11 +388,18 @@
 
   <header>
     <div class="header-inner">
-      <div class="brand-title mono">
-        REPERTORIO
-        <span id="total-badge" class="badge-count">0</span>
-        <span id="sync-indicator" style="font-size:0.68rem; color:var(--text-muted); font-weight:400; margin-left:0.4rem; opacity:0.85;"></span>
+      <div class="brand-left">
+        <div class="brand-title mono">
+          REPERTORIO
+          <span id="total-badge" class="badge-count">0</span>
+          <span id="sync-indicator" style="font-size:0.68rem; color:var(--text-muted); font-weight:400; opacity:0.85;"></span>
+        </div>
+        <div class="nav-tabs">
+          <button id="tab-repertoire" class="nav-tab active" onclick="switchTab('repertoire')">🎷 Standards</button>
+          <button id="tab-workshop" class="nav-tab" onclick="switchTab('workshop')">📚 Técnica / Lenguaje</button>
+        </div>
       </div>
+
       <div class="btn-group">
         <button id="btn-save-drive" class="btn btn-drive" onclick="saveToDrive()">☁️ Guardar en Drive</button>
         <button id="btn-load-drive" class="btn btn-drive" onclick="loadFromDrive()">☁️ Cargar de Drive</button>
@@ -275,7 +407,8 @@
     </div>
   </header>
 
-  <main>
+  <!-- VISTA 1: REPERTORIO DE STANDARDS -->
+  <main id="view-repertoire">
     <section class="toolbar">
       <div class="search-row">
         <input type="text" id="search-input" class="input-text" placeholder="Buscar standard, tonalidad o palabra clave en notas..." oninput="filterStandards()">
@@ -309,7 +442,26 @@
     <section id="standards-container" class="standards-list"></section>
   </main>
 
-  <div id="modal-overlay" class="modal-overlay" onclick="closeModalOnOutside(event)">
+  <!-- VISTA 2: TÉCNICA Y LENGUAJE -->
+  <main id="view-workshop" style="display:none;">
+    <section class="toolbar">
+      <div class="search-row">
+        <input type="text" id="wk-search-input" class="input-text" placeholder="Buscar ejercicio, acorde, etiqueta (ej. Terceras, II-V-I, 7alt)..." oninput="renderWorkshop()">
+        <button class="btn btn-primary" onclick="openNewWorkshopModal()">+ Ficha Técnica / Frase</button>
+      </div>
+
+      <div class="filter-chips">
+        <button class="chip active" onclick="setWkFilter('all', this)">Todo <span id="wk-count-all" class="mono">0</span></button>
+        <button class="chip" onclick="setWkFilter('technique', this)">⚙️ Técnica <span id="wk-count-tech" class="mono">0</span></button>
+        <button class="chip" onclick="setWkFilter('language', this)">🎷 Lenguaje / Frases <span id="wk-count-lang" class="mono">0</span></button>
+      </div>
+    </section>
+
+    <section id="workshop-container" class="workshop-grid"></section>
+  </main>
+
+  <!-- MODAL: EDITAR / NUEVO STANDARD -->
+  <div id="modal-overlay" class="modal-overlay" onclick="closeModalOnOutside(event, 'modal-overlay')">
     <div class="modal-card">
       <div style="font-weight:700; font-size:1.05rem;" id="modal-title">Editar Standard</div>
       <input type="hidden" id="edit-id">
@@ -339,15 +491,73 @@
       </div>
       <div>
         <label style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:0.25rem;">Notas de estudio / Dificultades</label>
-        <textarea id="edit-notes" class="input-text" style="width:100%;" placeholder="Ej: Puente en B mayor, enlace ii-V en compás 12, tempo objetivo 220 bpm..."></textarea>
+        <textarea id="edit-notes" class="input-text" style="width:100%;" placeholder="Ej: Puente en B mayor, enlace ii-V en compás 12..."></textarea>
       </div>
       <div style="display:flex; justify-content:space-between; margin-top:0.35rem;">
         <button class="btn" style="color:var(--red); border-color:rgba(248,113,113,0.3);" onclick="deleteCurrentStandard()">Eliminar</button>
         <div class="btn-group">
-          <button class="btn" onclick="closeModal()">Cancelar</button>
+          <button class="btn" onclick="closeModal('modal-overlay')">Cancelar</button>
           <button class="btn btn-primary" onclick="saveStandard()">Guardar</button>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- MODAL: NUEVA / EDITAR FICHA DE TÉCNICA O LENGUAJE -->
+  <div id="wk-modal-overlay" class="modal-overlay" onclick="closeModalOnOutside(event, 'wk-modal-overlay')">
+    <div class="modal-card">
+      <div style="font-weight:700; font-size:1.05rem;" id="wk-modal-title">Nueva Ficha de Estudio</div>
+      <input type="hidden" id="wk-edit-id">
+      <input type="hidden" id="wk-existing-url">
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem;">
+        <div>
+          <label style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:0.25rem;">Categoría</label>
+          <select id="wk-edit-type" class="input-text" style="width:100%;">
+            <option value="technique">⚙️ Técnica</option>
+            <option value="language">🎷 Lenguaje / Frase</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:0.25rem;">Etiquetas / Armonía</label>
+          <input type="text" id="wk-edit-tags" class="input-text mono" style="width:100%;" placeholder="Ej: II-V-I, 7alt, Cuatríadas">
+        </div>
+      </div>
+
+      <div>
+        <label style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:0.25rem;">Título / Concepto</label>
+        <input type="text" id="wk-edit-title" class="input-text" style="width:100%;" placeholder="Ej: Terceras / Lick II-V-I menor">
+      </div>
+
+      <div>
+        <label style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:0.25rem;">Indicaciones / Texto (opcional si adjuntas partitura)</label>
+        <textarea id="wk-edit-notes" class="input-text" style="width:100%; min-height:70px;" placeholder="Ej: Enlazar por grados conjuntos en todas las tonalidades..."></textarea>
+      </div>
+
+      <div>
+        <label style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:0.25rem;">Captura de partitura / ejercicio (opcional)</label>
+        <div id="paste-zone" class="paste-zone" onclick="document.getElementById('wk-file-input').click()">
+          <div>📋 Pega una captura aquí (<strong>Cmd + V</strong>) o haz clic para seleccionar imagen</div>
+          <div id="wk-preview-container"></div>
+        </div>
+        <input type="file" id="wk-file-input" accept="image/*" style="display:none" onchange="handleImageFile(event)">
+        <button id="btn-clear-img" class="btn" style="display:none; margin-top:0.4rem; font-size:0.7rem; color:var(--red);" onclick="clearWorkshopImage(event)">✕ Quitar imagen</button>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; margin-top:0.35rem;">
+        <button id="btn-wk-delete" class="btn" style="color:var(--red); border-color:rgba(248,113,113,0.3);" onclick="deleteCurrentWorkshop()">Eliminar</button>
+        <div class="btn-group">
+          <button class="btn" onclick="closeModal('wk-modal-overlay')">Cancelar</button>
+          <button id="btn-wk-save" class="btn btn-primary" onclick="saveWorkshopItem()">Guardar Ficha</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VISOR DE IMAGEN AMPLIADA -->
+  <div id="lightbox-overlay" class="modal-overlay" onclick="closeModal('lightbox-overlay')" style="z-index:60;">
+    <div style="max-width:95vw; max-height:92vh; background:#f8fafc; padding:0.5rem; border-radius:8px; box-shadow:0 20px 50px rgba(0,0,0,0.8);">
+      <img id="lightbox-img" src="" style="max-width:100%; max-height:86vh; display:block; border-radius:4px;">
     </div>
   </div>
 
@@ -358,6 +568,7 @@
   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzIBXnVD8tleVxzQVzBZQmUmgdPNQIFvXvmmhcwYl4X9JBRzQiJUsQiUUAmQj1henyq/exec";
     const STORAGE_KEY = "jazz_standards_vault_v5";
+    const WORKSHOP_STORAGE_KEY = "jazz_workshop_vault_v1";
     const SYNC_STORAGE_KEY = "jazz_repertoire_last_sync";
 
     const INITIAL_CATALOG = [
@@ -365,7 +576,10 @@
     ];
 
     let standards = [];
+    let workshop = [];
     let currentFilter = "all";
+    let wkFilter = "all";
+    let pendingBase64Image = null; // Guarda temporalmente la captura antes de subirla a Drive
 
     function escapeHTML(str) {
       if (!str) return "";
@@ -377,15 +591,19 @@
         .replace(/'/g, "&#039;");
     }
 
+    function switchTab(tab) {
+      document.getElementById("tab-repertoire").classList.toggle("active", tab === "repertoire");
+      document.getElementById("tab-workshop").classList.toggle("active", tab === "workshop");
+      document.getElementById("view-repertoire").style.display = (tab === "repertoire") ? "flex" : "none";
+      document.getElementById("view-workshop").style.display = (tab === "workshop") ? "flex" : "none";
+      if (tab === "workshop") renderWorkshop();
+    }
+
     function updateSyncTimestamp(timestampStr) {
       const el = document.getElementById("sync-indicator");
       if (!el) return;
       const val = timestampStr || localStorage.getItem(SYNC_STORAGE_KEY);
-      if (val) {
-        el.textContent = `• Sync: ${val}`;
-      } else {
-        el.textContent = "";
-      }
+      el.textContent = val ? `• Sync: ${val}` : "";
     }
 
     function setSyncSuccess() {
@@ -395,7 +613,6 @@
       const hours = String(now.getHours()).padStart(2, '0');
       const mins = String(now.getMinutes()).padStart(2, '0');
       const formatted = `${day}/${month} ${hours}:${mins}`;
-      
       localStorage.setItem(SYNC_STORAGE_KEY, formatted);
       updateSyncTimestamp(formatted);
     }
@@ -421,6 +638,12 @@
           }
         } else {
           loadDefaults();
+        }
+
+        const savedWk = localStorage.getItem(WORKSHOP_STORAGE_KEY);
+        if (savedWk) {
+          const parsedWk = JSON.parse(savedWk);
+          if (Array.isArray(parsedWk)) workshop = parsedWk;
         }
       } catch (err) {
         console.error("Error cargando localStorage:", err);
@@ -454,10 +677,13 @@
     function save() {
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(standards));
+        localStorage.setItem(WORKSHOP_STORAGE_KEY, JSON.stringify(workshop));
       } catch (e) {
         console.error("Error guardando en localStorage:", e);
       }
     }
+
+    // --- SINCRONIZACIÓN CON GOOGLE DRIVE ---
 
     async function saveToDrive() {
       const btn = document.getElementById("btn-save-drive");
@@ -470,12 +696,16 @@
           method: "POST",
           mode: "no-cors",
           headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify(standards)
+          body: JSON.stringify({
+            action: "save_all",
+            standards: standards,
+            workshop: workshop
+          })
         });
 
         setSyncSuccess();
         btn.innerHTML = "✓ Guardado";
-        alert("Repertorio sincronizado en Drive:\n• JSON fechado (con notas incluidas)\n• Repertorio.txt actualizado");
+        alert("Todo sincronizado en Drive:\n• JSON (Standards + Técnica/Lenguaje)\n• Repertorio.txt actualizado");
       } catch (err) {
         alert("Error al enviar a Drive: " + err.message);
       } finally {
@@ -504,22 +734,26 @@
           throw new Error("Respuesta no válida del servidor.");
         }
 
-        let lista = null;
-        let nombreArchivo = "respaldo";
-
-        if (Array.isArray(payload)) {
-          lista = payload;
-        } else if (payload && Array.isArray(payload.standards)) {
-          lista = payload.standards;
-          if (payload.fileName) nombreArchivo = payload.fileName;
-        } else if (payload && payload.status === "empty") {
+        if (payload && payload.status === "empty") {
           alert("No se encontró ningún archivo .json en tu carpeta de Drive.");
           return;
         }
 
-        if (lista && lista.length > 0) {
-          if (confirm(`Se han localizado ${lista.length} standards (${nombreArchivo}).\n¿Deseas sincronizar y actualizar tu repertorio local?`)) {
-            standards = lista.map((s, idx) => ({
+        const rawData = payload.data || payload.standards || payload;
+        let listaStandards = [];
+        let listaWorkshop = [];
+        let nombreArchivo = payload.fileName || "respaldo";
+
+        if (Array.isArray(rawData)) {
+          listaStandards = rawData;
+        } else if (rawData && Array.isArray(rawData.standards)) {
+          listaStandards = rawData.standards;
+          listaWorkshop = Array.isArray(rawData.workshop) ? rawData.workshop : [];
+        }
+
+        if (listaStandards.length > 0) {
+          if (confirm(`Se han localizado ${listaStandards.length} standards y ${listaWorkshop.length} fichas de Técnica/Lenguaje (${nombreArchivo}).\n¿Deseas sincronizar y actualizar este dispositivo?`)) {
+            standards = listaStandards.map((s, idx) => ({
               id: s.id || `std_${idx}`,
               title: s.title || "Sin título",
               key: s.key || "",
@@ -529,13 +763,15 @@
               nextReview: s.nextReview || null,
               notes: s.notes || ""
             }));
+            workshop = listaWorkshop;
             save();
             render();
+            renderWorkshop();
             setSyncSuccess();
             btn.innerHTML = "✓ Sincronizado";
           }
         } else {
-          alert("El archivo de Drive no contiene standards válidos.");
+          alert("El archivo de Drive no contiene datos válidos.");
         }
 
       } catch (err) {
@@ -548,6 +784,8 @@
       }
     }
 
+    // --- LÓGICA DE STANDARDS ---
+
     function updateCounts() {
       const counts = { pending: 0, melody: 0, harmony: 0, maturation: 0, assimilated: 0, due: 0 };
       const today = new Date().toISOString().split('T')[0];
@@ -559,11 +797,8 @@
         }
       });
 
-      const totalEl = document.getElementById("total-badge");
-      if (totalEl) totalEl.textContent = standards.length;
-      const countAll = document.getElementById("count-all");
-      if (countAll) countAll.textContent = standards.length;
-
+      document.getElementById("total-badge").textContent = standards.length;
+      document.getElementById("count-all").textContent = standards.length;
       document.getElementById("count-0").textContent = counts.pending;
       document.getElementById("count-1").textContent = counts.melody;
       document.getElementById("count-2").textContent = counts.harmony;
@@ -574,7 +809,7 @@
 
     function setFilter(filter, el) {
       currentFilter = filter;
-      document.querySelectorAll(".chip").forEach(c => c.classList.remove("active"));
+      document.querySelectorAll("#view-repertoire .chip").forEach(c => c.classList.remove("active"));
       if (el) el.classList.add("active");
       renderList();
     }
@@ -623,8 +858,7 @@
       const container = document.getElementById("standards-container");
       if (!container) return;
 
-      const searchInput = document.getElementById("search-input");
-      const search = searchInput ? (searchInput.value || "").toLowerCase().trim() : "";
+      const search = (document.getElementById("search-input").value || "").toLowerCase().trim();
       const today = new Date().toISOString().split('T')[0];
 
       const filtered = standards.filter(s => {
@@ -647,28 +881,24 @@
       container.innerHTML = filtered.map(s => {
         const isDue = s.level === "assimilated" && s.nextReview && s.nextReview <= today;
         const hasNotes = s.notes && s.notes.trim().length > 0;
-        const safeTitle = escapeHTML(s.title);
-        const safeKey = escapeHTML(s.key);
-        const safeForm = escapeHTML(s.form);
-        const safeNotes = escapeHTML(s.notes);
 
         return `
           <div class="standard-card" onclick="openEditModal('${s.id}')">
             <div class="card-info">
               <div class="card-title">
-                ${safeTitle}
+                ${escapeHTML(s.title)}
                 ${hasNotes ? `<span title="Tiene notas de estudio" style="font-size:0.75rem; opacity:0.85;">📝</span>` : ''}
               </div>
               <div class="card-meta mono">
-                ${safeKey ? `<span style="color:var(--accent);">${safeKey}</span> •` : ''}
-                ${safeForm ? `<span>${safeForm}</span>` : ''}
+                ${s.key ? `<span style="color:var(--accent);">${escapeHTML(s.key)}</span> •` : ''}
+                ${s.form ? `<span>${escapeHTML(s.form)}</span>` : ''}
                 ${s.level === 'assimilated' ? `
                   <span style="color:${isDue ? 'var(--red)' : 'var(--text-muted)'}; margin-left:0.3rem;">
                     ${isDue ? '⚠️ Repaso hoy' : `Repaso: ${s.nextReview || 'Programado'}`}
                   </span>
                 ` : ''}
               </div>
-              ${hasNotes ? `<div class="card-notes-preview">${safeNotes}</div>` : ''}
+              ${hasNotes ? `<div class="card-notes-preview">${escapeHTML(s.notes)}</div>` : ''}
             </div>
             <div class="card-actions">
               ${s.level === 'assimilated' ? `
@@ -694,7 +924,6 @@
     function spinRoulette(mode) {
       let pool = [];
       const challenges = [
-      // Sintaxis Post-Bop, Poliacordes y Cromatismo
         "Side-slipping: desplazar frases medio tono arriba o abajo de la armonía y resolver dentro.",
         "Tétradas / estructuras superiores: improvisar usando pares de tríadas (triad pairs) sobre cada acorde.",
         "Pares de intervalos: construir líneas exclusivamente mediante saltos de cuarta justa y quinta justa.",
@@ -703,29 +932,23 @@
         "Menor melódica.",
         "Intervalos de cuartas.",
         "Nota pivot: mantener una nota común (tónica o quinta del tema) como eje melódico durante toda una sección A.",
-        "Pentatónicas",
-
-        // Articulación, Dinámica y Sonido (Saxofón)
+        "Pentatónicas.",
         "Articulación invertida: ligar los tiempos débiles hacia los fuertes y picar solo las notas sincopadas.",
         "Subtone y pianissimo: tocar la melodía y un chorus completo al mínimo volumen posible sin perder aire.",
         "Crescendo estructural: empezar el chorus en ppp y llevar la intensidad hasta fff en el clímax del puente.",
         "Notas fantasma (ghost notes): exagerar el contraste dinámico entre notas acentuadas y notas semi-apagadas.",
         "Multifónicos o armónicos: integrar sobretonos o bifurcaciones tímbricas como puntos de tensión en el solo.",
-        "Frases extralargas",
-        "Concepto baterístico",
-        "Registro agudo",
-        "Registro grave",
-
-        // Fraseo, Tiempo y Métrica Avanzada
+        "Frases extralargas.",
+        "Concepto baterístico.",
+        "Registro agudo.",
+        "Registro grave.",
         "Cross-bar phrasing: empezar y terminar todas las frases en mitad de compás, nunca en el tiempo 1.",
         "Rubato interno: flotar sobre el pulso del metrónomo acelerando y frenando frases sin perder el compás.",
-        "Subdivisión de tresillos, quintillos o septillos",
+        "Subdivisión de tresillos, quintillos o septillos.",
         "Tempo lento (40-50 BPM): tocar la melodía y el solo subdividiendo mentalmente a semicorcheas.",
         "Medio tiempo (Half-time feel): improvisar con sensación de balada sobre un pulso rápido de swing.",
-        "Desplazamiento de la melodía",
-        "Elegir puntos de caídas de frases",
-
-        // Lenguaje, Transcripción y Repertorio Cruzado
+        "Desplazamiento de la melodía.",
+        "Elegir puntos de caídas de frases.",
         "Cita temática: insertar obligatoriamente el motivo de otro standard conocido dentro de tu solo.",
         "Contrafact instantáneo: improvisar una melodía nueva completa sobre los cambios sin tocar el tema original.",
         "Enfoque Steve Grossman / Joe Henderson: frases angulares con saltos amplios y síncopas agresivas.",
@@ -733,9 +956,9 @@
         "Walking bass.",
         "Intercambio de 4s imaginario: tocar 4 compases de solo y 4 compases de acompañamiento rítmico (comping).",
         "Improvisar una coda o turnaround extendido sin acompañamiento y resolver en calderón.",
-        "Lenguaje: trabajar una pieza de lenguaje concreta aplicándola en diferentes contextos armónicos",
-        "Cromatismos a notas de los acordes",
-        "Melodic Cells",
+        "Lenguaje: trabajar una pieza de lenguaje concreta aplicándola en diferentes contextos armónicos.",
+        "Cromatismos a notas de los acordes.",
+        "Melodic Cells."
       ];
 
       if (mode === "study") {
@@ -788,12 +1011,12 @@
       document.getElementById("modal-overlay").style.display = "flex";
     }
 
-    function closeModal() {
-      document.getElementById("modal-overlay").style.display = "none";
+    function closeModal(overlayId) {
+      document.getElementById(overlayId || "modal-overlay").style.display = "none";
     }
 
-    function closeModalOnOutside(e) {
-      if (e.target.id === "modal-overlay") closeModal();
+    function closeModalOnOutside(e, overlayId) {
+      if (e.target.id === overlayId) closeModal(overlayId);
     }
 
     function saveStandard() {
@@ -824,7 +1047,7 @@
         });
       }
       save();
-      closeModal();
+      closeModal("modal-overlay");
       render();
     }
 
@@ -834,8 +1057,260 @@
       if (confirm("¿Eliminar este standard de la lista?")) {
         standards = standards.filter(s => s.id !== id);
         save();
-        closeModal();
+        closeModal("modal-overlay");
         render();
+      }
+    }
+
+    // --- LÓGICA DE TÉCNICA Y LENGUAJE ---
+
+    function setWkFilter(filter, el) {
+      wkFilter = filter;
+      document.querySelectorAll("#view-workshop .chip").forEach(c => c.classList.remove("active"));
+      if (el) el.classList.add("active");
+      renderWorkshop();
+    }
+
+    function renderWorkshop() {
+      const container = document.getElementById("workshop-container");
+      if (!container) return;
+
+      const techCount = workshop.filter(w => w.type === "technique").length;
+      const langCount = workshop.filter(w => w.type === "language").length;
+      document.getElementById("wk-count-all").textContent = workshop.length;
+      document.getElementById("wk-count-tech").textContent = techCount;
+      document.getElementById("wk-count-lang").textContent = langCount;
+
+      const search = (document.getElementById("wk-search-input").value || "").toLowerCase().trim();
+
+      const filtered = workshop.filter(w => {
+        if (wkFilter !== "all" && w.type !== wkFilter) return false;
+        if (!search) return true;
+        const inTitle = w.title.toLowerCase().includes(search);
+        const inNotes = (w.notes || "").toLowerCase().includes(search);
+        const inTags = (w.tags || []).some(t => t.toLowerCase().includes(search));
+        return inTitle || inNotes || inTags;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<div style="grid-column: 1 / -1; text-align:center; padding:2.5rem; color:var(--text-muted); font-size:0.85rem;">No hay fichas guardadas en esta categoría. Pulsa "+ Ficha Técnica / Frase" para añadir una.</div>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map(w => {
+        const isTech = w.type === "technique";
+        const tagsHtml = (w.tags || []).map(t => `<span class="wk-tag">${escapeHTML(t)}</span>`).join("");
+
+        return `
+          <div class="wk-card">
+            <div style="display:flex; flex-direction:column; gap:0.5rem;">
+              <div class="wk-header">
+                <span class="wk-badge ${w.type}">${isTech ? '⚙️ Técnica' : '🎷 Lenguaje'}</span>
+                <button class="btn" style="padding:0.2rem 0.5rem; font-size:0.7rem;" onclick="openEditWorkshopModal('${w.id}')">Editar</button>
+              </div>
+              <div style="font-weight:700; font-size:0.95rem; color:#fff;">${escapeHTML(w.title)}</div>
+              ${tagsHtml ? `<div class="wk-tags">${tagsHtml}</div>` : ''}
+              ${w.notes ? `<div class="wk-body">${escapeHTML(w.notes)}</div>` : ''}
+            </div>
+            ${w.imageUrl ? `
+              <div class="wk-img-wrap" onclick="openLightbox('${w.imageUrl}')">
+                <img src="${w.imageUrl}" alt="${escapeHTML(w.title)}" loading="lazy">
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }).join("");
+    }
+
+    function openLightbox(url) {
+      document.getElementById("lightbox-img").src = url;
+      document.getElementById("lightbox-overlay").style.display = "flex";
+    }
+
+    function openNewWorkshopModal() {
+      document.getElementById("wk-modal-title").textContent = "Nueva Ficha de Estudio";
+      document.getElementById("wk-edit-id").value = "";
+      document.getElementById("wk-existing-url").value = "";
+      document.getElementById("wk-edit-type").value = "technique";
+      document.getElementById("wk-edit-tags").value = "";
+      document.getElementById("wk-edit-title").value = "";
+      document.getElementById("wk-edit-notes").value = "";
+      pendingBase64Image = null;
+      document.getElementById("wk-preview-container").innerHTML = "";
+      document.getElementById("btn-clear-img").style.display = "none";
+      document.getElementById("btn-wk-delete").style.display = "none";
+      document.getElementById("wk-modal-overlay").style.display = "flex";
+    }
+
+    function openEditWorkshopModal(id) {
+      const w = workshop.find(item => item.id === id);
+      if (!w) return;
+      document.getElementById("wk-modal-title").textContent = "Editar Ficha";
+      document.getElementById("wk-edit-id").value = w.id;
+      document.getElementById("wk-existing-url").value = w.imageUrl || "";
+      document.getElementById("wk-edit-type").value = w.type || "technique";
+      document.getElementById("wk-edit-tags").value = (w.tags || []).join(", ");
+      document.getElementById("wk-edit-title").value = w.title;
+      document.getElementById("wk-edit-notes").value = w.notes || "";
+      pendingBase64Image = null;
+
+      if (w.imageUrl) {
+        document.getElementById("wk-preview-container").innerHTML = `<img src="${w.imageUrl}" class="paste-preview">`;
+        document.getElementById("btn-clear-img").style.display = "inline-flex";
+      } else {
+        document.getElementById("wk-preview-container").innerHTML = "";
+        document.getElementById("btn-clear-img").style.display = "none";
+      }
+
+      document.getElementById("btn-wk-delete").style.display = "inline-flex";
+      document.getElementById("wk-modal-overlay").style.display = "flex";
+    }
+
+    function clearWorkshopImage(e) {
+      if (e) e.stopPropagation();
+      pendingBase64Image = null;
+      document.getElementById("wk-existing-url").value = "";
+      document.getElementById("wk-preview-container").innerHTML = "";
+      document.getElementById("btn-clear-img").style.display = "none";
+      document.getElementById("wk-file-input").value = "";
+    }
+
+    // Procesar imagen pegada (Cmd+V) o seleccionada
+    document.addEventListener("paste", function(e) {
+      const modalVisible = document.getElementById("wk-modal-overlay").style.display === "flex";
+      if (!modalVisible) return;
+
+      const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].type.indexOf("image") !== -1) {
+          const blob = items[i].getAsFile();
+          compressImageFile(blob);
+          break;
+        }
+      }
+    });
+
+    function handleImageFile(e) {
+      const file = e.target.files[0];
+      if (file) compressImageFile(file);
+    }
+
+    function compressImageFile(file) {
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement("canvas");
+          const MAX_WIDTH = 1100;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > MAX_WIDTH) {
+            height = Math.round((height * MAX_WIDTH) / width);
+            width = MAX_WIDTH;
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          ctx.fillStyle = "#ffffff";
+          ctx.fillRect(0, 0, width, height);
+          ctx.drawImage(img, 0, 0, width, height);
+
+          pendingBase64Image = canvas.toDataURL("image/jpeg", 0.85);
+          document.getElementById("wk-preview-container").innerHTML = `<img src="${pendingBase64Image}" class="paste-preview">`;
+          document.getElementById("btn-clear-img").style.display = "inline-flex";
+        };
+        img.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function saveWorkshopItem() {
+      const id = document.getElementById("wk-edit-id").value;
+      const type = document.getElementById("wk-edit-type").value;
+      const title = document.getElementById("wk-edit-title").value.trim();
+      const notes = document.getElementById("wk-edit-notes").value.trim();
+      const tagsRaw = document.getElementById("wk-edit-tags").value;
+      const tags = tagsRaw.split(",").map(t => t.trim()).filter(t => t.length > 0);
+      let imageUrl = document.getElementById("wk-existing-url").value;
+
+      if (!title) {
+        alert("Escribe un título o concepto para la ficha.");
+        return;
+      }
+
+      const btn = document.getElementById("btn-wk-save");
+      const originalText = btn.innerHTML;
+
+      // Si hay una nueva captura pegada, subirla primero a su carpeta de Drive
+      if (pendingBase64Image) {
+        btn.innerHTML = "⏳ Subiendo imagen a Drive...";
+        btn.disabled = true;
+
+        try {
+          const res = await fetch(SCRIPT_URL, {
+            method: "POST",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({
+              action: "upload_image",
+              category: type,
+              title: title,
+              imageBase64: pendingBase64Image
+            })
+          });
+          const result = await res.json();
+          if (result && result.status === "success" && result.imageUrl) {
+            imageUrl = result.imageUrl;
+          } else {
+            throw new Error(result.message || "Error al guardar imagen en Drive");
+          }
+        } catch (err) {
+          alert("No se pudo subir la imagen a Drive: " + err.message);
+          btn.innerHTML = originalText;
+          btn.disabled = false;
+          return;
+        }
+      }
+
+      if (id) {
+        const item = workshop.find(w => w.id === id);
+        if (item) {
+          item.type = type;
+          item.title = title;
+          item.tags = tags;
+          item.notes = notes;
+          item.imageUrl = imageUrl;
+        }
+      } else {
+        workshop.unshift({
+          id: "wk_" + Date.now(),
+          type,
+          title,
+          tags,
+          notes,
+          imageUrl
+        });
+      }
+
+      save();
+      btn.innerHTML = originalText;
+      btn.disabled = false;
+      closeModal("wk-modal-overlay");
+      renderWorkshop();
+
+      // Sincronizar automáticamente el índice JSON en Drive tras guardar la ficha
+      saveToDrive();
+    }
+
+    function deleteCurrentWorkshop() {
+      const id = document.getElementById("wk-edit-id").value;
+      if (!id) return;
+      if (confirm("¿Eliminar esta ficha de Técnica / Lenguaje?")) {
+        workshop = workshop.filter(w => w.id !== id);
+        save();
+        closeModal("wk-modal-overlay");
+        renderWorkshop();
       }
     }
 
