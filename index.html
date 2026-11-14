@@ -502,7 +502,7 @@
       <!-- METRÓNOMO -->
       <div class="studio-box">
         <div class="studio-box-header">
-          <span>Metrónomo Acústico</span>
+          <span>Metrónomo (Tap de Pie)</span>
           <div class="beat-dots">
             <span id="dot-0" class="beat-dot"></span>
             <span id="dot-1" class="beat-dot"></span>
@@ -523,12 +523,18 @@
             <option value="all">Negras (1 - 2 - 3 - 4)</option>
             <option value="one">Solo tiempo 1</option>
           </select>
-          <select id="metro-gap" class="input-text" style="padding:0.3rem 0.5rem; font-size:0.74rem;" onchange="resetMetroCounter()">
+          <select id="metro-gap" class="input-text" style="padding:0.3rem 0.5rem; font-size:0.74rem;" onchange="onGapModeChange()">
             <option value="0">Sin silencios (Continuo)</option>
+            <option value="random">Gap Aleatorio (%)</option>
             <option value="3-1">Gap: 3 compases ON / 1 OFF</option>
             <option value="2-2">Gap: 2 compases ON / 2 OFF</option>
             <option value="4-4">Gap: 4 compases ON / 4 OFF</option>
           </select>
+        </div>
+        <div id="random-gap-box" style="display:none; align-items:center; gap:0.5rem; font-size:0.74rem; color:var(--text-muted); padding-top:0.2rem;">
+          <span>Silenciar taps:</span>
+          <input type="range" id="gap-prob-slider" min="10" max="90" step="5" value="35" style="flex:1; accent-color:var(--accent);" oninput="document.getElementById('gap-prob-val').textContent = this.value + '%'">
+          <span id="gap-prob-val" class="mono" style="color:var(--accent); font-weight:700; min-width:34px;">35%</span>
         </div>
       </div>
 
@@ -1066,23 +1072,59 @@
       currentBar = 0;
     }
 
+    function onGapModeChange() {
+      resetMetroCounter();
+      const gapMode = document.getElementById("metro-gap").value;
+      const sliderBox = document.getElementById("random-gap-box");
+      if (sliderBox) {
+        sliderBox.style.display = (gapMode === "random") ? "flex" : "none";
+      }
+    }
+
+    // Sonido orgánico de tap de pie sobre madera (golpe grave + roce corto)
     function playClickSound(time, isAccent) {
       const ctx = getAudioCtx();
+
+      // 1. Cuerpo grave del impacto del pie (145 Hz -> 48 Hz)
       const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
+      const oscGain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(isAccent ? 165 : 140, time);
+      osc.frequency.exponentialRampToValueAtTime(45, time + 0.055);
 
-      osc.type = "triangle";
-      osc.frequency.setValueAtTime(isAccent ? 1320 : 880, time);
-      osc.frequency.exponentialRampToValueAtTime(isAccent ? 660 : 440, time + 0.025);
+      oscGain.gain.setValueAtTime(0.001, time);
+      oscGain.gain.linearRampToValueAtTime(isAccent ? 0.85 : 0.65, time + 0.004);
+      oscGain.gain.exponentialRampToValueAtTime(0.001, time + 0.065);
 
-      gain.gain.setValueAtTime(0.001, time);
-      gain.gain.linearRampToValueAtTime(isAccent ? 0.55 : 0.4, time + 0.003);
-      gain.gain.exponentialRampToValueAtTime(0.001, time + 0.032);
-
-      osc.connect(gain);
-      gain.connect(ctx.destination);
+      osc.connect(oscGain);
+      oscGain.connect(ctx.destination);
       osc.start(time);
-      osc.stop(time + 0.035);
+      osc.stop(time + 0.07);
+
+      // 2. Textura corta de suela/madera filtrada a 380 Hz (sin brillo agudo)
+      const bufferSize = Math.floor(ctx.sampleRate * 0.035);
+      const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const data = noiseBuffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (ctx.sampleRate * 0.01));
+      }
+
+      const noise = ctx.createBufferSource();
+      noise.buffer = noiseBuffer;
+
+      const filter = ctx.createBiquadFilter();
+      filter.type = "bandpass";
+      filter.frequency.value = isAccent ? 460 : 360;
+      filter.Q.value = 1.8;
+
+      const noiseGain = ctx.createGain();
+      noiseGain.gain.setValueAtTime(isAccent ? 0.45 : 0.32, time);
+      noiseGain.gain.exponentialRampToValueAtTime(0.001, time + 0.032);
+
+      noise.connect(filter);
+      filter.connect(noiseGain);
+      noiseGain.connect(ctx.destination);
+      noise.start(time);
     }
 
     function scheduleMetronome() {
@@ -1090,32 +1132,39 @@
       const lookahead = 0.1;
       const feel = document.getElementById("metro-feel").value;
       const gapMode = document.getElementById("metro-gap").value;
+      const gapProb = Number(document.getElementById("gap-prob-slider")?.value || 35);
 
       while (nextNoteTime < ctx.currentTime + lookahead) {
         const beatInBar = currentBeat % 4;
         const barIndex = Math.floor(currentBeat / 4);
 
-        // Determinar si estamos en compás de silencio (Gap)
-        let isGapBar = false;
-        if (gapMode === "3-1") isGapBar = (barIndex % 4) === 3;
-        else if (gapMode === "2-2") isGapBar = (barIndex % 4) >= 2;
-        else if (gapMode === "4-4") isGapBar = (barIndex % 8) >= 4;
+        // Determinar si el pulso corresponde al patrón rítmico elegido
+        let inPattern = false;
+        if (feel === "2and4") inPattern = (beatInBar === 1 || beatInBar === 3);
+        else if (feel === "all") inPattern = true;
+        else if (feel === "one") inPattern = (beatInBar === 0);
 
-        // Determinar si suena este pulso según el feel
-        let shouldSound = false;
-        if (!isGapBar) {
-          if (feel === "2and4") shouldSound = (beatInBar === 1 || beatInBar === 3);
-          else if (feel === "all") shouldSound = true;
-          else if (feel === "one") shouldSound = (beatInBar === 0);
+        // Evaluar si toca silencio (Gap por compases o Gap aleatorio por pulso)
+        let isGap = false;
+        if (gapMode === "3-1") {
+          isGap = (barIndex % 4) === 3;
+        } else if (gapMode === "2-2") {
+          isGap = (barIndex % 4) >= 2;
+        } else if (gapMode === "4-4") {
+          isGap = (barIndex % 8) >= 4;
+        } else if (gapMode === "random" && inPattern) {
+          isGap = (Math.random() * 100) < gapProb;
         }
+
+        const shouldSound = inPattern && !isGap;
 
         if (shouldSound) {
           playClickSound(nextNoteTime, beatInBar === 0 && feel === "all");
         }
 
-        // Actualizar LED visual sincronizado
+        // Actualizar LED visual sincronizado (ámbar si el pulso ha sido silenciado)
         const visualBeat = beatInBar;
-        const visualGap = isGapBar;
+        const visualGap = isGap && inPattern;
         const delayMs = Math.max(0, (nextNoteTime - ctx.currentTime) * 1000);
         setTimeout(() => {
           for (let i = 0; i < 4; i++) {
