@@ -6,7 +6,13 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="REPERTORIO">
+  <meta name="theme-color" content="#090a0c">
   <title>REPERTORIO</title>
+  <link id="pwa-manifest" rel="manifest">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='36' fill='%23090a0c'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-family='monospace' font-weight='bold' font-size='72' fill='%2338bdf8'%3EREP%3C/text%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -43,7 +49,7 @@
       top: 0;
       z-index: 30;
       backdrop-filter: blur(8px);
-      padding: 0.75rem 1rem;
+      padding: 0.7rem 1rem;
     }
     .header-inner {
       max-width: 1100px;
@@ -52,42 +58,41 @@
       flex-wrap: wrap;
       align-items: center;
       justify-content: space-between;
-      gap: 0.75rem;
+      gap: 0.65rem;
     }
     .brand-left {
       display: flex;
       align-items: center;
-      gap: 1rem;
+      gap: 0.85rem;
       flex-wrap: wrap;
     }
     .brand-title {
-      font-size: 1.15rem;
+      font-size: 1.1rem;
       font-weight: 800;
       letter-spacing: 0.08em;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.45rem;
     }
     .badge-count {
-      font-size: 0.75rem;
-      padding: 0.15rem 0.5rem;
+      font-size: 0.72rem;
+      padding: 0.12rem 0.48rem;
       border-radius: 9999px;
       background: var(--card-border);
       color: var(--text-muted);
     }
 
-    /* Navegación de pestañas */
     .nav-tabs {
       display: inline-flex;
       background: #14171d;
       border: 1px solid var(--card-border);
       border-radius: 6px;
-      padding: 0.2rem;
-      gap: 0.2rem;
+      padding: 0.18rem;
+      gap: 0.18rem;
     }
     .nav-tab {
-      padding: 0.35rem 0.75rem;
-      font-size: 0.78rem;
+      padding: 0.32rem 0.68rem;
+      font-size: 0.76rem;
       font-weight: 600;
       border-radius: 4px;
       border: none;
@@ -101,14 +106,14 @@
       color: var(--accent);
     }
 
-    .btn-group { display: flex; gap: 0.45rem; align-items: center; flex-wrap: wrap; }
+    .btn-group { display: flex; gap: 0.4rem; align-items: center; flex-wrap: wrap; }
     .btn {
       display: inline-flex;
       align-items: center;
-      gap: 0.4rem;
-      padding: 0.4rem 0.7rem;
+      gap: 0.35rem;
+      padding: 0.38rem 0.65rem;
       border-radius: 6px;
-      font-size: 0.75rem;
+      font-size: 0.74rem;
       font-weight: 600;
       cursor: pointer;
       border: 1px solid var(--card-border);
@@ -122,6 +127,96 @@
     .btn-primary:hover { opacity: 0.9; }
     .btn-drive { background: #1e293b; color: #38bdf8; border-color: rgba(56, 189, 248, 0.4); }
     .btn-drive:hover { background: #283548; }
+    .btn-drive.dirty {
+      border-color: var(--amber);
+      color: var(--amber);
+      box-shadow: 0 0 10px rgba(251, 191, 36, 0.2);
+    }
+
+    /* PANEL DE ESTUDIO (METRÓNOMO + DRONES) */
+    .studio-bar {
+      background: #0e1014;
+      border-bottom: 1px solid var(--card-border);
+      padding: 0.75rem 1rem;
+      display: none;
+    }
+    .studio-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 0.85rem;
+    }
+    .studio-box {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 0.75rem 0.9rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+    .studio-box-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .metro-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      flex-wrap: wrap;
+    }
+    .bpm-display {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--accent);
+      min-width: 68px;
+      text-align: center;
+    }
+    .beat-dots {
+      display: flex;
+      gap: 0.35rem;
+      align-items: center;
+    }
+    .beat-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #23272f;
+      transition: background 0.05s;
+    }
+    .beat-dot.active { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+    .beat-dot.gap { background: #374151; border: 1px solid var(--amber); }
+
+    .drone-notes {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 0.3rem;
+    }
+    .note-btn {
+      padding: 0.35rem 0.2rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border-radius: 4px;
+      border: 1px solid var(--card-border);
+      background: #181b20;
+      color: var(--text-main);
+      cursor: pointer;
+      text-align: center;
+      touch-action: manipulation;
+    }
+    .note-btn:hover { border-color: #3b4252; }
+    .note-btn.active {
+      background: var(--accent);
+      color: #000;
+      border-color: var(--accent);
+    }
 
     main {
       flex: 1;
@@ -289,11 +384,7 @@
     }
     .wk-badge.technique { background: rgba(251, 191, 36, 0.15); color: var(--amber); border: 1px solid rgba(251, 191, 36, 0.3); }
     .wk-badge.language { background: rgba(192, 132, 252, 0.15); color: var(--purple); border: 1px solid rgba(192, 132, 252, 0.3); }
-    .wk-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.3rem;
-    }
+    .wk-tags { display: flex; flex-wrap: wrap; gap: 0.3rem; }
     .wk-tag {
       font-size: 0.68rem;
       background: #1a1e26;
@@ -323,7 +414,6 @@
       border-radius: 3px;
     }
 
-    /* Zona de pegado de captura en Modal */
     .paste-zone {
       border: 1px dashed #3b4252;
       background: #0f1115;
@@ -335,10 +425,7 @@
       cursor: pointer;
       transition: border-color 0.15s;
     }
-    .paste-zone:hover, .paste-zone.dragover {
-      border-color: var(--accent);
-      color: var(--text-main);
-    }
+    .paste-zone:hover { border-color: var(--accent); color: var(--text-main); }
     .paste-preview {
       max-height: 180px;
       max-width: 100%;
@@ -401,11 +488,71 @@
       </div>
 
       <div class="btn-group">
+        <button id="btn-studio-toggle" class="btn" onclick="toggleStudioBar()">⏱️ Estudio (Metrónomo / Drone)</button>
         <button id="btn-save-drive" class="btn btn-drive" onclick="saveToDrive()">☁️ Guardar en Drive</button>
         <button id="btn-load-drive" class="btn btn-drive" onclick="loadFromDrive()">☁️ Cargar de Drive</button>
+        <button class="btn" title="Cambiar PIN de Drive" onclick="configurePin(true)" style="padding:0.38rem 0.5rem;">🔑</button>
       </div>
     </div>
   </header>
+
+  <!-- PANEL DE ESTUDIO: METRÓNOMO (2 y 4 + GAP) Y DRONES (Bb/C) -->
+  <section id="studio-bar" class="studio-bar">
+    <div class="studio-inner">
+      <!-- METRÓNOMO -->
+      <div class="studio-box">
+        <div class="studio-box-header">
+          <span>Metrónomo Acústico</span>
+          <div class="beat-dots">
+            <span id="dot-0" class="beat-dot"></span>
+            <span id="dot-1" class="beat-dot"></span>
+            <span id="dot-2" class="beat-dot"></span>
+            <span id="dot-3" class="beat-dot"></span>
+          </div>
+        </div>
+        <div class="metro-controls">
+          <button id="btn-metro-play" class="btn btn-primary" onclick="toggleMetronome()">▶ Iniciar</button>
+          <button class="btn mono" onclick="changeBpm(-5)">-5</button>
+          <span id="bpm-val" class="bpm-display mono">120</span>
+          <button class="btn mono" onclick="changeBpm(5)">+5</button>
+          <button class="btn" onclick="tapTempo()">Tap</button>
+        </div>
+        <div class="metro-controls">
+          <select id="metro-feel" class="input-text" style="padding:0.3rem 0.5rem; font-size:0.74rem;" onchange="resetMetroCounter()">
+            <option value="2and4">Solo 2 y 4 (Jazz Swing)</option>
+            <option value="all">Negras (1 - 2 - 3 - 4)</option>
+            <option value="one">Solo tiempo 1</option>
+          </select>
+          <select id="metro-gap" class="input-text" style="padding:0.3rem 0.5rem; font-size:0.74rem;" onchange="resetMetroCounter()">
+            <option value="0">Sin silencios (Continuo)</option>
+            <option value="3-1">Gap: 3 compases ON / 1 OFF</option>
+            <option value="2-2">Gap: 2 compases ON / 2 OFF</option>
+            <option value="4-4">Gap: 4 compases ON / 4 OFF</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- DRONES / BORDONES -->
+      <div class="studio-box">
+        <div class="studio-box-header">
+          <span>Drone / Bordón Armónico</span>
+          <div style="display:flex; gap:0.3rem; align-items:center;">
+            <select id="drone-transp" class="input-text mono" style="padding:0.15rem 0.35rem; font-size:0.7rem;" onchange="updateDroneSound()">
+              <option value="-2">Saxo Bb (Ten/Sop)</option>
+              <option value="0">Concert (C)</option>
+            </select>
+            <select id="drone-interval" class="input-text" style="padding:0.15rem 0.35rem; font-size:0.7rem;" onchange="updateDroneSound()">
+              <option value="fifth">Tónica + 5ª</option>
+              <option value="root">Solo Tónica</option>
+              <option value="maj3">Tónica + 3ªM</option>
+              <option value="min3">Tónica + 3ªm</option>
+            </select>
+          </div>
+        </div>
+        <div class="drone-notes mono" id="drone-grid"></div>
+      </div>
+    </div>
+  </section>
 
   <!-- VISTA 1: REPERTORIO DE STANDARDS -->
   <main id="view-repertoire">
@@ -570,6 +717,7 @@
     const STORAGE_KEY = "jazz_standards_vault_v5";
     const WORKSHOP_STORAGE_KEY = "jazz_workshop_vault_v1";
     const SYNC_STORAGE_KEY = "jazz_repertoire_last_sync";
+    const PIN_STORAGE_KEY = "jazz_drive_secret_pin";
 
     const INITIAL_CATALOG = [
       "Airegin","All Blues","All of Me","All of You","All or Nothing at All","All The Things You Are","Alone Together","Along Came Betty","Anthropology","April in Paris","Ask Me Now","Au Privave","Autumn in New York","Autumn Leaves","Bags' Groove","Beatrice","Beautiful Love","Bessie's Blues","Billie's Bounce","Black Orpheus","Bloomdido","Blue Bossa","Blue in Green","Blue Monk","Blue Train","Blues For Alice","Blues in the Closet","Body and Soul","Bolivia","Broadway","But Beautiful","But Not for Me","Buzzy","Bye Bye Blackbird","Birdlike","C Jam Blues","C.T.A.","Cantaloupe Island","Caravan","Ceora","Cheese Cake","Chelsea Bridge","Cherokee","A Child Is Born","Come Rain or Come Shine","Come Sunday","Con Alma","Confirmation","Corcovado","Cottontail","Crazeology","Darn That Dream","Days of Wine and Roses","Desafinado","Dewey Square","Dexterity","Dolphin Dance","Donna Lee","Don't Get Around Much Anymore","Doxy","East of the Sun","Easy to Love","Embraceable You","Epistrophy","Equinox","The Eternal Triangle","Everything Happens to Me","Evidence","Ev'ry Time We Say Goodbye","Falling Grace","Footprints","Four","Fried Bananas","Gentle Rain","Georgia on My Mind","Giant Steps","The Girl from Ipanema","Good Bait","Green Dolphin Street","Groovin' High","Half Nelson","Have You Met Miss Jones?","Here's That Rainy Day","Hi-Fly","Honeysuckle Rose","How Deep Is the Ocean","How High the Moon","How Insensitive","I Can't Get Started","I Could Write a Book","I Fall in Love Too Easily","I Got Rhythm","I Hear a Rhapsody","I Love You","I Mean You","I Remember You","I Should Care","I Thought About You","If I Should Lose You","If I Were a Bell","I'll Remember April","I'm Getting Sentimental Over You","Impressions","In a Mellow Tone","In a Sentimental Mood","In Your Own Sweet Way","Inner Urge","Invitation","It Could Happen to You","It's You or No One","Jitterbug Waltz","Joy Spring","Just Friends","Just in Time","Just One of Those Things","Just You, Just Me","Lady Bird","Laura","Like Someone in Love","Like Sonny","Limehouse Blues","Little Sunflower","Long Ago and Far Away","Love for Sale","Lover","Lover Man","Lullaby of Birdland","Maiden Voyage","Manha de Carnaval","Meditation","Minority","Misterioso","Moment's Notice","Monk's Dream","Moose the Mooch","The More I See You","Move","Mr. P.C.","My Favorite Things","My Funny Valentine","My Ideal","My Little Suede Shoes","My One and Only Love","My Romance","My Shining Hour","Naima","Nica's Dream","Night and Day","Night Has a Thousand Eyes","A Night in Tunisia","Nothing Personal","Now's the Time","Old Devil Moon","Old Folks","Oleo","On a Slow Boat to China","On Green Dolphin Street","On the Sunny Side of the Street","One Note Samba","Ornithology","Out of Nowhere","Pannonica","Peace","Pensativa","Pent Up House","Perdido","Polka Dots and Moonbeams","Prelude to a Kiss","Recorda-Me","Reflections","Relaxin' at Camarillo","Rhythm-a-Ning","Room 608","Round Midnight","Ruby, My Dear","San-Du","Satin Doll","Scrapple from the Apple","Secret Love","Serpent's Tooth","Seven Come Eleven","Seven Steps to Heaven","Sidewinder","Skylark","So What","Softly, As in a Morning Sunrise","Solar","Some Day My Prince Will Come","Some Other Blues","Song for My Father","The Song Is You","Sonnymoon for Two","Soul Eyes","Speak Low","Speak No Evil","Spring Can Really Hang You Up the Most","St. Thomas","Stablemates","Star Eyes","Stella by Starlight","Stolen Moments","Straight, No Chaser","Sugar","Summertime","Take the 'A' Train","Tangerine","Tenderly","Tenor Madness","That's All","There Is No Greater Love","There Will Never Be Another You","This I Dig of You","The Touch of Your Lips","Triste","Tune Up","Turn Out the Stars","26-2","Up Jumped Spring","Upper Manhattan Medical Group","Voyage","Walking Shoes","Watermelon Man","Wave","Wee","Well You Needn't","When I Fall in Love","Whisper Not","Will You Still Be Mine","Woody 'n' You","Yardbird Suite","Yes or No","Yesterdays","You Stepped Out of a Dream","You'd Be So Nice to Come Home To"
@@ -579,7 +727,27 @@
     let workshop = [];
     let currentFilter = "all";
     let wkFilter = "all";
-    let pendingBase64Image = null; // Guarda temporalmente la captura antes de subirla a Drive
+    let pendingBase64Image = null;
+    let hasUnsavedChanges = false;
+
+    // --- MANIFEST PWA DINÁMICO ---
+    (function setupPWA() {
+      const manifest = {
+        name: "REPERTORIO Jazz & Técnica",
+        short_name: "REPERTORIO",
+        start_url: window.location.href,
+        display: "standalone",
+        background_color: "#090a0c",
+        theme_color: "#090a0c",
+        icons: [{
+          src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='96' fill='%23090a0c'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-family='monospace' font-weight='bold' font-size='190' fill='%2338bdf8'%3EREP%3C/text%3E%3C/svg%3E",
+          sizes: "512x512",
+          type: "image/svg+xml"
+        }]
+      };
+      const blob = new Blob([JSON.stringify(manifest)], { type: "application/json" });
+      document.getElementById("pwa-manifest").setAttribute("href", URL.createObjectURL(blob));
+    })();
 
     function escapeHTML(str) {
       if (!str) return "";
@@ -589,6 +757,44 @@
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
+    }
+
+    function markDirty(isDirty) {
+      hasUnsavedChanges = isDirty;
+      const btn = document.getElementById("btn-save-drive");
+      if (!btn) return;
+      if (isDirty) {
+        btn.classList.add("dirty");
+        btn.innerHTML = "● Guardar en Drive";
+      } else {
+        btn.classList.remove("dirty");
+        btn.innerHTML = "☁️ Guardar en Drive";
+      }
+    }
+
+    window.addEventListener("beforeunload", function (e) {
+      if (hasUnsavedChanges) {
+        e.preventDefault();
+        e.returnValue = "";
+      }
+    });
+
+    function getDrivePin() {
+      let pin = localStorage.getItem(PIN_STORAGE_KEY);
+      if (!pin) {
+        pin = configurePin(false);
+      }
+      return pin;
+    }
+
+    function configurePin(forcePrompt) {
+      const current = localStorage.getItem(PIN_STORAGE_KEY) || "";
+      const entered = prompt("Introduce tu PIN de seguridad de Google Drive:", forcePrompt ? current : "");
+      if (entered && entered.trim().length > 0) {
+        localStorage.setItem(PIN_STORAGE_KEY, entered.trim());
+        return entered.trim();
+      }
+      return current;
     }
 
     function switchTab(tab) {
@@ -615,6 +821,12 @@
       const formatted = `${day}/${month} ${hours}:${mins}`;
       localStorage.setItem(SYNC_STORAGE_KEY, formatted);
       updateSyncTimestamp(formatted);
+      markDirty(false);
+    }
+
+    function sortAllLists() {
+      standards.sort((a, b) => a.title.localeCompare(b.title, 'es', { sensitivity: 'base' }));
+      workshop.sort((a, b) => a.title.localeCompare(b.title, 'es', { sensitivity: 'base' }));
     }
 
     function init() {
@@ -649,6 +861,8 @@
         console.error("Error cargando localStorage:", err);
         loadDefaults();
       }
+      sortAllLists();
+      buildDroneButtons();
       updateSyncTimestamp();
       render();
     }
@@ -664,7 +878,8 @@
         nextReview: null,
         notes: ""
       }));
-      save();
+      sortAllLists();
+      save(false);
     }
 
     function resetToDefaults() {
@@ -674,20 +889,23 @@
       }
     }
 
-    function save() {
+    function save(triggerDirty = true) {
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(standards));
         localStorage.setItem(WORKSHOP_STORAGE_KEY, JSON.stringify(workshop));
+        if (triggerDirty) markDirty(true);
       } catch (e) {
         console.error("Error guardando en localStorage:", e);
       }
     }
 
-    // --- SINCRONIZACIÓN CON GOOGLE DRIVE ---
+    // --- SINCRONIZACIÓN SEGURA CON GOOGLE DRIVE ---
 
     async function saveToDrive() {
+      const pin = getDrivePin();
+      if (!pin) return;
+
       const btn = document.getElementById("btn-save-drive");
-      const originalText = btn.innerHTML;
       btn.innerHTML = "⏳ Guardando...";
       btn.disabled = true;
 
@@ -697,6 +915,7 @@
           mode: "no-cors",
           headers: { "Content-Type": "text/plain;charset=utf-8" },
           body: JSON.stringify({
+            token: pin,
             action: "save_all",
             standards: standards,
             workshop: workshop
@@ -705,26 +924,30 @@
 
         setSyncSuccess();
         btn.innerHTML = "✓ Guardado";
-        alert("Todo sincronizado en Drive:\n• JSON (Standards + Técnica/Lenguaje)\n• Repertorio.txt actualizado");
+        setTimeout(() => {
+          btn.innerHTML = "☁️ Guardar en Drive";
+          btn.disabled = false;
+        }, 1800);
       } catch (err) {
         alert("Error al enviar a Drive: " + err.message);
-      } finally {
-        setTimeout(() => {
-          btn.innerHTML = originalText;
-          btn.disabled = false;
-        }, 2000);
+        btn.disabled = false;
+        markDirty(hasUnsavedChanges);
       }
     }
 
     async function loadFromDrive() {
+      const pin = getDrivePin();
+      if (!pin) return;
+
       const btn = document.getElementById("btn-load-drive");
       const originalText = btn.innerHTML;
       btn.innerHTML = "⏳ Conectando...";
       btn.disabled = true;
 
       try {
-        const urlConCacheBuster = SCRIPT_URL + (SCRIPT_URL.includes("?") ? "&" : "?") + "t=" + Date.now();
-        const response = await fetch(urlConCacheBuster, { method: "GET" });
+        const sep = SCRIPT_URL.includes("?") ? "&" : "?";
+        const urlConPin = `${SCRIPT_URL}${sep}token=${encodeURIComponent(pin)}&t=${Date.now()}`;
+        const response = await fetch(urlConPin, { method: "GET" });
         const rawText = await response.text();
 
         let payload;
@@ -732,6 +955,12 @@
           payload = JSON.parse(rawText);
         } catch (e) {
           throw new Error("Respuesta no válida del servidor.");
+        }
+
+        if (payload && payload.status === "unauthorized") {
+          localStorage.removeItem(PIN_STORAGE_KEY);
+          alert("PIN incorrecto. Pulsa de nuevo 'Cargar de Drive' para introducir el PIN correcto.");
+          return;
         }
 
         if (payload && payload.status === "empty") {
@@ -752,7 +981,7 @@
         }
 
         if (listaStandards.length > 0) {
-          if (confirm(`Se han localizado ${listaStandards.length} standards y ${listaWorkshop.length} fichas de Técnica/Lenguaje (${nombreArchivo}).\n¿Deseas sincronizar y actualizar este dispositivo?`)) {
+          if (confirm(`Se han localizado ${listaStandards.length} standards y ${listaWorkshop.length} fichas (${nombreArchivo}).\n¿Sincronizar y actualizar este dispositivo?`)) {
             standards = listaStandards.map((s, idx) => ({
               id: s.id || `std_${idx}`,
               title: s.title || "Sin título",
@@ -764,7 +993,8 @@
               notes: s.notes || ""
             }));
             workshop = listaWorkshop;
-            save();
+            sortAllLists();
+            save(false);
             render();
             renderWorkshop();
             setSyncSuccess();
@@ -782,6 +1012,243 @@
           btn.disabled = false;
         }, 2000);
       }
+    }
+
+    // --- MOTOR DE AUDIO WEB (METRÓNOMO ACÚSTICO + DRONES) ---
+
+    let audioCtx = null;
+    function getAudioCtx() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === "suspended") {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
+    function toggleStudioBar() {
+      const bar = document.getElementById("studio-bar");
+      const isVisible = bar.style.display === "block";
+      bar.style.display = isVisible ? "none" : "block";
+      document.getElementById("btn-studio-toggle").classList.toggle("active", !isVisible);
+    }
+
+    // 1. Metrónomo con transitorio tipo woodblock/rimshot y modo Gap
+    let metroRunning = false;
+    let bpm = 120;
+    let currentBeat = 0;
+    let currentBar = 0;
+    let nextNoteTime = 0;
+    let metroTimerId = null;
+    let tapTimes = [];
+
+    function changeBpm(delta) {
+      bpm = Math.min(340, Math.max(30, bpm + delta));
+      document.getElementById("bpm-val").textContent = bpm;
+    }
+
+    function tapTempo() {
+      const now = performance.now();
+      tapTimes.push(now);
+      if (tapTimes.length > 4) tapTimes.shift();
+      if (tapTimes.length >= 2) {
+        let sum = 0;
+        for (let i = 1; i < tapTimes.length; i++) sum += (tapTimes[i] - tapTimes[i - 1]);
+        const avg = sum / (tapTimes.length - 1);
+        bpm = Math.min(340, Math.max(30, Math.round(60000 / avg)));
+        document.getElementById("bpm-val").textContent = bpm;
+      }
+    }
+
+    function resetMetroCounter() {
+      currentBeat = 0;
+      currentBar = 0;
+    }
+
+    function playClickSound(time, isAccent) {
+      const ctx = getAudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = "triangle";
+      osc.frequency.setValueAtTime(isAccent ? 1320 : 880, time);
+      osc.frequency.exponentialRampToValueAtTime(isAccent ? 660 : 440, time + 0.025);
+
+      gain.gain.setValueAtTime(0.001, time);
+      gain.gain.linearRampToValueAtTime(isAccent ? 0.55 : 0.4, time + 0.003);
+      gain.gain.exponentialRampToValueAtTime(0.001, time + 0.032);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(time);
+      osc.stop(time + 0.035);
+    }
+
+    function scheduleMetronome() {
+      const ctx = getAudioCtx();
+      const lookahead = 0.1;
+      const feel = document.getElementById("metro-feel").value;
+      const gapMode = document.getElementById("metro-gap").value;
+
+      while (nextNoteTime < ctx.currentTime + lookahead) {
+        const beatInBar = currentBeat % 4;
+        const barIndex = Math.floor(currentBeat / 4);
+
+        // Determinar si estamos en compás de silencio (Gap)
+        let isGapBar = false;
+        if (gapMode === "3-1") isGapBar = (barIndex % 4) === 3;
+        else if (gapMode === "2-2") isGapBar = (barIndex % 4) >= 2;
+        else if (gapMode === "4-4") isGapBar = (barIndex % 8) >= 4;
+
+        // Determinar si suena este pulso según el feel
+        let shouldSound = false;
+        if (!isGapBar) {
+          if (feel === "2and4") shouldSound = (beatInBar === 1 || beatInBar === 3);
+          else if (feel === "all") shouldSound = true;
+          else if (feel === "one") shouldSound = (beatInBar === 0);
+        }
+
+        if (shouldSound) {
+          playClickSound(nextNoteTime, beatInBar === 0 && feel === "all");
+        }
+
+        // Actualizar LED visual sincronizado
+        const visualBeat = beatInBar;
+        const visualGap = isGapBar;
+        const delayMs = Math.max(0, (nextNoteTime - ctx.currentTime) * 1000);
+        setTimeout(() => {
+          for (let i = 0; i < 4; i++) {
+            const dot = document.getElementById(`dot-${i}`);
+            if (dot) {
+              dot.className = "beat-dot" + (i === visualBeat ? (visualGap ? " gap" : " active") : "");
+            }
+          }
+        }, delayMs);
+
+        nextNoteTime += 60.0 / bpm;
+        currentBeat++;
+      }
+      if (metroRunning) {
+        metroTimerId = setTimeout(scheduleMetronome, 25);
+      }
+    }
+
+    function toggleMetronome() {
+      const btn = document.getElementById("btn-metro-play");
+      if (!metroRunning) {
+        const ctx = getAudioCtx();
+        metroRunning = true;
+        resetMetroCounter();
+        nextNoteTime = ctx.currentTime + 0.05;
+        btn.innerHTML = "⏹ Parar";
+        btn.style.background = "var(--red)";
+        btn.style.borderColor = "var(--red)";
+        scheduleMetronome();
+      } else {
+        metroRunning = false;
+        clearTimeout(metroTimerId);
+        btn.innerHTML = "▶ Iniciar";
+        btn.style.background = "";
+        btn.style.borderColor = "";
+        for (let i = 0; i < 4; i++) {
+          document.getElementById(`dot-${i}`).className = "beat-dot";
+        }
+      }
+    }
+
+    // 2. Generador de Drones cálidos (Triangular + Sub + LowPass 650Hz)
+    const NOTE_NAMES = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"];
+    let activeDroneNoteIndex = null;
+    let droneNodes = null;
+
+    function buildDroneButtons() {
+      const grid = document.getElementById("drone-grid");
+      if (!grid) return;
+      grid.innerHTML = NOTE_NAMES.map((n, idx) =>
+        `<button class="note-btn" id="drone-btn-${idx}" onclick="toggleDroneNote(${idx})">${n}</button>`
+      ).join("");
+    }
+
+    function stopDrone() {
+      if (droneNodes) {
+        const ctx = getAudioCtx();
+        const now = ctx.currentTime;
+        droneNodes.masterGain.gain.setTargetAtTime(0.0001, now, 0.08);
+        const oldNodes = droneNodes;
+        setTimeout(() => {
+          oldNodes.oscs.forEach(o => { try { o.stop(); } catch(e){} });
+        }, 350);
+        droneNodes = null;
+      }
+      document.querySelectorAll(".note-btn").forEach(b => b.classList.remove("active"));
+    }
+
+    function toggleDroneNote(noteIdx) {
+      if (activeDroneNoteIndex === noteIdx) {
+        activeDroneNoteIndex = null;
+        stopDrone();
+        return;
+      }
+      activeDroneNoteIndex = noteIdx;
+      document.querySelectorAll(".note-btn").forEach(b => b.classList.remove("active"));
+      document.getElementById(`drone-btn-${noteIdx}`).classList.add("active");
+      updateDroneSound();
+    }
+
+    function updateDroneSound() {
+      if (activeDroneNoteIndex === null) return;
+      stopDrone();
+      document.getElementById(`drone-btn-${activeDroneNoteIndex}`).classList.add("active");
+
+      const ctx = getAudioCtx();
+      const transp = Number(document.getElementById("drone-transp").value); // -2 para Bb, 0 para C
+      const intervalMode = document.getElementById("drone-interval").value;
+
+      // MIDI base en octava grave cálida (C3 = 48)
+      const rootMidi = 48 + activeDroneNoteIndex + transp;
+      const rootFreq = 440 * Math.pow(2, (rootMidi - 69) / 12);
+
+      const filter = ctx.createBiquadFilter();
+      filter.type = "lowpass";
+      filter.frequency.value = 650;
+      filter.Q.value = 1.2;
+
+      const masterGain = ctx.createGain();
+      masterGain.gain.setValueAtTime(0.001, ctx.currentTime);
+      masterGain.gain.setTargetAtTime(0.24, ctx.currentTime, 0.12);
+
+      filter.connect(masterGain);
+      masterGain.connect(ctx.destination);
+
+      const oscs = [];
+      function addVoice(freq, type, detuneCents, vol) {
+        const osc = ctx.createOscillator();
+        const vGain = ctx.createGain();
+        osc.type = type;
+        osc.frequency.value = freq;
+        osc.detune.value = detuneCents;
+        vGain.gain.value = vol;
+        osc.connect(vGain);
+        vGain.connect(filter);
+        osc.start();
+        oscs.push(osc);
+      }
+
+      // Cuerpo principal: par triangular ligeramente desafinado + sub senoidal
+      addVoice(rootFreq, "triangle", -3, 0.45);
+      addVoice(rootFreq, "triangle", 3, 0.45);
+      addVoice(rootFreq / 2, "sine", 0, 0.5);
+
+      if (intervalMode === "fifth") {
+        addVoice(rootFreq * Math.pow(2, 7 / 12), "triangle", 0, 0.35);
+      } else if (intervalMode === "maj3") {
+        addVoice(rootFreq * Math.pow(2, 4 / 12), "triangle", 0, 0.3);
+      } else if (intervalMode === "min3") {
+        addVoice(rootFreq * Math.pow(2, 3 / 12), "triangle", 0, 0.3);
+      }
+
+      droneNodes = { oscs, masterGain };
     }
 
     // --- LÓGICA DE STANDARDS ---
@@ -830,7 +1297,7 @@
         d.setDate(d.getDate() + 15);
         item.nextReview = d.toISOString().split('T')[0];
       }
-      save();
+      save(true);
       render();
     }
 
@@ -850,7 +1317,7 @@
         d.setDate(d.getDate() + 7);
         item.nextReview = d.toISOString().split('T')[0];
       }
-      save();
+      save(true);
       render();
     }
 
@@ -1019,7 +1486,7 @@
       if (e.target.id === overlayId) closeModal(overlayId);
     }
 
-   function saveStandard() {
+    function saveStandard() {
       const id = document.getElementById("edit-id").value;
       const title = document.getElementById("edit-name").value.trim();
       const key = document.getElementById("edit-key").value.trim();
@@ -1046,11 +1513,8 @@
           nextReview: null
         });
       }
-
-      // Ordenar alfabéticamente toda la lista (A-Z)
-      standards.sort((a, b) => a.title.localeCompare(b.title, 'es', { sensitivity: 'base' }));
-
-      save();
+      sortAllLists();
+      save(true);
       closeModal("modal-overlay");
       render();
     }
@@ -1060,7 +1524,7 @@
       if (!id) return;
       if (confirm("¿Eliminar este standard de la lista?")) {
         standards = standards.filter(s => s.id !== id);
-        save();
+        save(true);
         closeModal("modal-overlay");
         render();
       }
@@ -1179,7 +1643,6 @@
       document.getElementById("wk-file-input").value = "";
     }
 
-    // Procesar imagen pegada (Cmd+V) o seleccionada
     document.addEventListener("paste", function(e) {
       const modalVisible = document.getElementById("wk-modal-overlay").style.display === "flex";
       if (!modalVisible) return;
@@ -1247,9 +1710,11 @@
       const btn = document.getElementById("btn-wk-save");
       const originalText = btn.innerHTML;
 
-      // Si hay una nueva captura pegada, subirla primero a su carpeta de Drive
       if (pendingBase64Image) {
-        btn.innerHTML = "⏳ Subiendo imagen a Drive...";
+        const pin = getDrivePin();
+        if (!pin) return;
+
+        btn.innerHTML = "⏳ Subiendo imagen...";
         btn.disabled = true;
 
         try {
@@ -1257,6 +1722,7 @@
             method: "POST",
             headers: { "Content-Type": "text/plain;charset=utf-8" },
             body: JSON.stringify({
+              token: pin,
               action: "upload_image",
               category: type,
               title: title,
@@ -1264,6 +1730,10 @@
             })
           });
           const result = await res.json();
+          if (result && result.status === "unauthorized") {
+            localStorage.removeItem(PIN_STORAGE_KEY);
+            throw new Error("PIN incorrecto. Inténtalo de nuevo.");
+          }
           if (result && result.status === "success" && result.imageUrl) {
             imageUrl = result.imageUrl;
           } else {
@@ -1287,7 +1757,7 @@
           item.imageUrl = imageUrl;
         }
       } else {
-        workshop.unshift({
+        workshop.push({
           id: "wk_" + Date.now(),
           type,
           title,
@@ -1297,13 +1767,12 @@
         });
       }
 
-      save();
+      sortAllLists();
+      save(true);
       btn.innerHTML = originalText;
       btn.disabled = false;
       closeModal("wk-modal-overlay");
       renderWorkshop();
-
-      // Sincronizar automáticamente el índice JSON en Drive tras guardar la ficha
       saveToDrive();
     }
 
@@ -1312,7 +1781,7 @@
       if (!id) return;
       if (confirm("¿Eliminar esta ficha de Técnica / Lenguaje?")) {
         workshop = workshop.filter(w => w.id !== id);
-        save();
+        save(true);
         closeModal("wk-modal-overlay");
         renderWorkshop();
       }
