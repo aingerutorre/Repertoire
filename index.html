@@ -859,7 +859,8 @@
       workshop.sort((a, b) => a.title.localeCompare(b.title, 'es', { sensitivity: 'base' }));
     }
 
-    function init() {
+async function init() {
+      // 1. Carga instantánea desde localStorage (funciona incluso sin internet)
       try {
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) {
@@ -891,10 +892,69 @@
         console.error("Error cargando localStorage:", err);
         loadDefaults();
       }
+
       sortAllLists();
       buildDroneButtons();
       updateSyncTimestamp();
       render();
+
+      // 2. Sincronización silenciosa automática desde Google Drive si hay PIN guardado
+      const savedPin = localStorage.getItem(PIN_STORAGE_KEY);
+      if (savedPin && navigator.onLine) {
+        silentSyncFromDrive(savedPin);
+      }
+    }
+
+    async function silentSyncFromDrive(pin) {
+      const indicator = document.getElementById("sync-indicator");
+      if (indicator) indicator.textContent = "• Comprobando Drive...";
+
+      try {
+        const sep = SCRIPT_URL.includes("?") ? "&" : "?";
+        const urlConPin = `${SCRIPT_URL}${sep}token=${encodeURIComponent(pin)}&t=${Date.now()}`;
+        const response = await fetch(urlConPin, { method: "GET" });
+        const payload = await response.json();
+
+        if (!payload || payload.status !== "success") {
+          updateSyncTimestamp();
+          return;
+        }
+
+        const rawData = payload.data || payload.standards || payload;
+        let listaStandards = [];
+        let listaWorkshop = [];
+
+        if (Array.isArray(rawData)) {
+          listaStandards = rawData;
+        } else if (rawData && Array.isArray(rawData.standards)) {
+          listaStandards = rawData.standards;
+          listaWorkshop = Array.isArray(rawData.workshop) ? rawData.workshop : [];
+        }
+
+        if (listaStandards.length > 0) {
+          standards = listaStandards.map((s, idx) => ({
+            id: s.id || `std_${idx}`,
+            title: s.title || "Sin título",
+            key: s.key || "",
+            form: s.form || "AABA",
+            level: ["pending", "melody", "harmony", "maturation", "assimilated"].includes(s.level) ? s.level : "pending",
+            srsInterval: Number(s.srsInterval) || 15,
+            nextReview: s.nextReview || null,
+            notes: s.notes || ""
+          }));
+          workshop = listaWorkshop;
+          sortAllLists();
+          save(false);
+          render();
+          if (document.getElementById("view-workshop").style.display !== "none") {
+            renderWorkshop();
+          }
+          setSyncSuccess();
+        }
+      } catch (err) {
+        console.warn("Auto-sync en segundo plano omitido:", err);
+        updateSyncTimestamp();
+      }
     }
 
     function loadDefaults() {
