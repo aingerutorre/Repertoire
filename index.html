@@ -1105,19 +1105,27 @@
       }
     }
 
-    // Sonido orgánico de tap de pie sobre madera (golpe grave + roce corto)
+  let metroVolume = 0.75;
+    function updateMetroVolume(val) {
+      metroVolume = Number(val);
+      document.getElementById("metro-vol-val").textContent = Math.round(metroVolume * 100) + "%";
+    }
+
+    // Sonido orgánico de tap de pie sobre madera con control de volumen
     function playClickSound(time, isAccent) {
+      if (metroVolume <= 0) return;
       const ctx = getAudioCtx();
 
-      // 1. Cuerpo grave del impacto del pie (145 Hz -> 48 Hz)
+      // 1. Cuerpo grave del impacto del pie (145 Hz -> 45 Hz)
       const osc = ctx.createOscillator();
       const oscGain = ctx.createGain();
       osc.type = "sine";
       osc.frequency.setValueAtTime(isAccent ? 165 : 140, time);
       osc.frequency.exponentialRampToValueAtTime(45, time + 0.055);
 
+      const peakOsc = (isAccent ? 0.95 : 0.75) * metroVolume;
       oscGain.gain.setValueAtTime(0.001, time);
-      oscGain.gain.linearRampToValueAtTime(isAccent ? 0.85 : 0.65, time + 0.004);
+      oscGain.gain.linearRampToValueAtTime(Math.max(0.002, peakOsc), time + 0.004);
       oscGain.gain.exponentialRampToValueAtTime(0.001, time + 0.065);
 
       osc.connect(oscGain);
@@ -1125,7 +1133,7 @@
       osc.start(time);
       osc.stop(time + 0.07);
 
-      // 2. Textura corta de suela/madera filtrada a 380 Hz (sin brillo agudo)
+      // 2. Textura corta de suela/madera filtrada a 360 Hz
       const bufferSize = Math.floor(ctx.sampleRate * 0.035);
       const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
       const data = noiseBuffer.getChannelData(0);
@@ -1141,8 +1149,9 @@
       filter.frequency.value = isAccent ? 460 : 360;
       filter.Q.value = 1.8;
 
+      const peakNoise = (isAccent ? 0.5 : 0.36) * metroVolume;
       const noiseGain = ctx.createGain();
-      noiseGain.gain.setValueAtTime(isAccent ? 0.45 : 0.32, time);
+      noiseGain.gain.setValueAtTime(Math.max(0.002, peakNoise), time);
       noiseGain.gain.exponentialRampToValueAtTime(0.001, time + 0.032);
 
       noise.connect(filter);
@@ -1150,7 +1159,6 @@
       noiseGain.connect(ctx.destination);
       noise.start(time);
     }
-
     function scheduleMetronome() {
       const ctx = getAudioCtx();
       const lookahead = 0.1;
@@ -1234,6 +1242,15 @@
     const NOTE_NAMES = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"];
     let activeDroneNoteIndex = null;
     let droneNodes = null;
+    let droneVolume = 0.6;
+    function updateDroneVolume(val) {
+      droneVolume = Number(val);
+      document.getElementById("drone-vol-val").textContent = Math.round(droneVolume * 100) + "%";
+      if (droneNodes && droneNodes.masterGain) {
+        const ctx = getAudioCtx();
+        droneNodes.masterGain.gain.setTargetAtTime(droneVolume * 0.4, ctx.currentTime, 0.05);
+      }
+    }
 
     function buildDroneButtons() {
       const grid = document.getElementById("drone-grid");
@@ -1287,9 +1304,9 @@
       filter.frequency.value = 650;
       filter.Q.value = 1.2;
 
-      const masterGain = ctx.createGain();
+     const masterGain = ctx.createGain();
       masterGain.gain.setValueAtTime(0.001, ctx.currentTime);
-      masterGain.gain.setTargetAtTime(0.24, ctx.currentTime, 0.12);
+      masterGain.gain.setTargetAtTime(Math.max(0.0001, droneVolume * 0.4), ctx.currentTime, 0.12);
 
       filter.connect(masterGain);
       masterGain.connect(ctx.destination);
