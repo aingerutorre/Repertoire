@@ -550,6 +550,11 @@
           <input type="range" id="gap-prob-slider" min="10" max="90" step="5" value="35" style="flex:1; accent-color:var(--accent);" oninput="document.getElementById('gap-prob-val').textContent = this.value + '%'">
           <span id="gap-prob-val" class="mono" style="color:var(--accent); font-weight:700; min-width:34px;">35%</span>
         </div>
+        <div class="vol-control">
+          <span>🔊</span>
+          <input type="range" id="metro-vol-slider" min="0" max="1" step="0.05" value="0.75" oninput="updateMetroVolume(this.value)">
+          <span id="metro-vol-val" class="mono" style="min-width:34px; text-align:right;">75%</span>
+        </div>
       </div>
 
       <!-- DRONES / BORDONES -->
@@ -570,6 +575,11 @@
           </div>
         </div>
         <div class="drone-notes mono" id="drone-grid"></div>
+        <div class="vol-control">
+          <span>🔊</span>
+          <input type="range" id="drone-vol-slider" min="0" max="1" step="0.05" value="0.6" oninput="updateDroneVolume(this.value)">
+          <span id="drone-vol-val" class="mono" style="min-width:34px; text-align:right;">60%</span>
+        </div>
       </div>
     </div>
   </section>
